@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Carta Natal — Whole Sign (HTML único)</title>
+  <!--
+    Calcula posiciones planetarias con Astronomy Engine (MIT):
+    https://cdn.jsdelivr.net/npm/astronomy-engine
+
+    Ascendente (λAsc) por fórmula astronómica (PM 2Ring, StackExchange / Meeus):
+    λAsc = atan2(cos θL, -(sin θL cos ε + tan φ sin ε))
+    donde θL = tiempo sidéreo local (rad), ε = oblicuidad de la eclíptica (rad), φ = latitud (rad).
+
+    Medio Cielo (λMC): tan λMC = tan θL / cos ε  → λMC = atan2(sin θL, cos θL·cos ε)
+
+    Oblicuidad (ε) aproximada (Astronomical Almanac / Laskar):
+      ε (deg) = 23° 26′ 21.448″ − 46.8150″·T − 0.00059″·T² + 0.001813″·T³,
+      con T = siglos julianos desde J2000 (TT≈UTC a efectos prácticos de esta app).
+
+    Sistema de casas: Whole Sign (1ª casa = signo del Ascendente; cada casa = 30°).
+  -->
+  <style>
+    :root{
+      --bg:#0b0f14; --panel:#121823; --accent:#6ee7ff; --muted:#9fb3c8; --ok:#7CFFB6; --warn:#ffd166; --err:#ff6b6b;
+    }
+    html,body{height:100%; background:var(--bg); color:#e8eef6; font:14px/1.35 system-ui,Segoe UI,Roboto,Helvetica,Arial,sans-serif;}
+    h1{font-weight:700; letter-spacing:.2px; font-size:18px; margin:8px 0 12px}
+    .wrap{max-width:1080px; margin:0 auto; padding:16px; display:grid; gap:16px; grid-template-columns: 360px 1fr;}
+    .card{background:var(--panel); border:1px solid #1f2633; border-radius:14px; padding:14px; box-shadow:0 10px 25px rgba(0,0,0,.25)}
+    label{display:block; font-size:12px; color:var(--muted); margin:8px 0 4px}
+    input,select,button{width:100%; padding:10px 12px; border-radius:10px; border:1px solid #283142; background:#0f141d; color:#e8eef6}
+    .row{display:grid; gap:10px; grid-template-columns:1fr 1fr}
+    button{cursor:pointer; background:#0f1724; border-color:#2a3752}
+    button.primary{background:linear-gradient(180deg,#2b8fff,#1466ff); border:none}
+    .muted{color:var(--muted)}
+    .legend{display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:8px; font-feature-settings:"tnum" 1;}
+    .legend div{background:#0b111b; border:1px solid #20283a; border-radius:10px; padding:8px}
+    canvas{width:100%; height:auto; background:#0a0e14; border-radius:14px; display:block}
+    .small{font-size:12px; color:var(--muted)}
+    .inline{display:flex; gap:8px; align-items:center}
+    .pill{display:inline-flex; align-items:center; gap:6px; background:#0b111b; border:1px solid #20283a; border-radius:999px; padding:4px 10px; font-size:12px}
+    .right{justify-content:flex-end}
+    .tip{margin-top:6px; font-size:12px; color:#b9cbe2}
+    .foot{opacity:.7; font-size:12px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>⚝ Carta Natal — Whole Sign</h1>
+      <div class="row">
+        <div>
+          <label>Nombre (opcional)</label>
+          <input id="name" placeholder="p.ej. Manu"/>
+        </div>
+        <div>
+          <label>Zona horaria (UTC±h)</label>
+          <input id="tz" type="number" step="0.25" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Fecha</label>
+          <input id="date" type="date" />
+        </div>
+        <div>
+          <label>Hora</label>
+          <input id="time" type="time" step="60" />
+        </div>
+      </div>
+
+      <label>Localización (búsqueda opcional)</label>
+      <div class="row">
+        <input id="q" placeholder="Ciudad, país (p.ej. Barcelona, ES)">
+        <button id="btnGeo">Buscar</button>
+      </div>
+
+      <div class="row" style="margin-top:8px">
+        <div>
+          <label>Latitud (°)</label>
+          <input id="lat" type="number" step="0.000001" placeholder="41.388" />
+        </div>
+        <div>
+          <label>Longitud (°, Este positivo)</label>
+          <input id="lon" type="number" step="0.000001" placeholder="2.170" />
+        </div>
+      </div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="pill" id="btnNow">Ahora/aquí</button>
+        <div class="right inline">
+          <button id="btnDraw" class="primary">Dibujar carta</button>
+        </div>
+      </div>
+
+      <div class="tip">Consejo: si no conoces el huso horario, deja el valor por defecto (detectado). Si no conoces la lat/lon, escribe la ciudad y pulsa <b>Buscar</b>.</div>
+      <div id="status" class="tip"></div>
+      <div class="small foot" style="margin-top:10px">Precisión: posiciones planetarias ~±1′ (Astronomy Engine). Asc/MC por fórmulas astronómicas estándar. Uso tropical y casas de <i>Whole Sign</i>.</div>
+    </div>
+
+    <div class="card">
+      <canvas id="chart" width="900" height="900"></canvas>
+      <div id="readout" class="legend" style="margin-top:12px"></div>
+    </div>
+  </div>
+
+  <!-- Astronomy Engine en el navegador -->
+  <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.0/astronomy.browser.js"></script>
+  <script>
+    const signGlyph = ["♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓"];
+    const signNames = ["Aries","Tauro","Géminis","Cáncer","Leo","Virgo","Libra","Escorpio","Sagitario","Capricornio","Acuario","Piscis"];
+    const planetList = [
+      {key:"Sun", glyph:"☉", name:"Sol"},
+      {key:"Moon", glyph:"☽", name:"Luna"},
+      {key:"Mercury", glyph:"☿", name:"Mercurio"},
+      {key:"Venus", glyph:"♀", name:"Venus"},
+      {key:"Mars", glyph:"♂", name:"Marte"},
+      {key:"Jupiter", glyph:"♃", name:"Júpiter"},
+      {key:"Saturn", glyph:"♄", name:"Saturno"},
+      {key:"Uranus", glyph:"♅", name:"Urano"},
+      {key:"Neptune", glyph:"♆", name:"Neptuno"},
+      {key:"Pluto", glyph:"♇", name:"Plutón"}
+    ];
+
+    const $ = sel => document.querySelector(sel);
+    const deg2rad = d => d*Math.PI/180;
+    const rad2deg = r => (r*180/Math.PI);
+    const norm = d => ((d%360)+360)%360;
+
+    // Julian Day (UTC) y siglos julianos desde J2000
+    function julianDayUTC(date){
+      // date: JS Date en UTC
+      const Y = date.getUTCFullYear();
+      let M = date.getUTCMonth()+1;
+      const D = date.getUTCDate() + (date.getUTCHours() + (date.getUTCMinutes()/60)) / 24;
+      if(M <= 2){ M+=12; Y-1; }
+      const A = Math.floor(Y/100);
+      const B = 2 - A + Math.floor(A/4);
+      const JD = Math.floor(365.25*(Y+4716)) + Math.floor(30.6001*(M+1)) + D + B - 1524.5;
+      return JD;
+    }
+    function julianCenturies(date){
+      const JD = julianDayUTC(date);
+      return (JD - 2451545.0)/36525.0;
+    }
+
+    // Oblicuidad de la eclíptica (deg)
+    function obliquityEcliptic(date){
+      const T = julianCenturies(date);
+      const arcsec = 21.448 - 46.8150*T - 0.00059*T*T + 0.001813*T*T*T; // en segundos
+      return 23 + 26/60 + arcsec/3600; // grados
+    }
+
+    // Tiempo sidéreo de Greenwich (GMST) en horas
+    function gmstHours(date){
+      // Siglos julianos desde J2000 (UT)
+      const T = julianCenturies(date);
+      let gmst = (67310.548 + (3155760000 + 8640184.812866)*T + 0.093104*T*T - 6.2e-6*T*T*T) / 3600; // horas
+      gmst = ((gmst%24)+24)%24;
+      return gmst;
+    }
+
+    function ascendantLongitude(dateUTC, latDeg, lonDeg){
+      const eps = deg2rad(obliquityEcliptic(dateUTC));
+      const phi = deg2rad(latDeg);
+      const thetaL = deg2rad(gmstHours(dateUTC)*15 + lonDeg); // LST en grados → rad
+      const num = Math.cos(thetaL);
+      const den = - (Math.sin(thetaL)*Math.cos(eps) + Math.tan(phi)*Math.sin(eps));
+      const lambda = Math.atan2(num, den);
+      return norm(rad2deg(lambda));
+    }
+
+    function midheavenLongitude(dateUTC, lonDeg){
+      const eps = deg2rad(obliquityEcliptic(dateUTC));
+      const thetaL = deg2rad(gmstHours(dateUTC)*15 + lonDeg);
+      // λMC = atan2( sin θ, cos θ · cos ε )
+      const lambda = Math.atan2(Math.sin(thetaL), Math.cos(thetaL)*Math.cos(eps));
+      return norm(rad2deg(lambda));
+    }
+
+    // Geocéntrico: eclíptica J2000 (para tropical práctico)
+    function eclipticLongitude(bodyKey, astroTime){
+      let vec;
+      if(bodyKey === "Moon"){
+        vec = Astronomy.GeoMoon(astroTime);
+      } else {
+        vec = Astronomy.GeoVector(bodyKey, astroTime, true);
+      }
+      const ecl = Astronomy.Ecliptic(vec.x, vec.y, vec.z);
+      return norm(ecl.elon);
+    }
+
+    function formatZodiac(lon){
+      const s = Math.floor(lon/30);
+      const deg = Math.floor(lon - s*30);
+      const min = Math.floor((lon - s*30 - deg)*60);
+      return `${deg}°${min.toString().padStart(2,'0')} ${signGlyph[s]} (${signNames[s]})`;
+    }
+
+    // Dibujo de rueda Whole Sign
+    function drawChart(data){
+      const canvas = document.getElementById('chart');
+      const ctx = canvas.getContext('2d');
+      const W = canvas.width, H = canvas.height; ctx.clearRect(0,0,W,H);
+      const cx = W/2, cy = H/2; const R = 400; const rHouse = 330; const rPlan = 260; const rSigns = 365;
+
+      // Fondo
+      ctx.beginPath(); ctx.arc(cx,cy,R+8,0,Math.PI*2); ctx.fillStyle = '#0b111b'; ctx.fill();
+
+      // 12 casas: igual tamaño (Whole Sign)
+      for(let i=0;i<12;i++){
+        const start = (Math.PI) + (i*30 + 0)*Math.PI/180; // Asc en la izquierda (π rad)
+        const end   = (Math.PI) + ((i+1)*30)*Math.PI/180;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.arc(cx,cy,R,start,end);
+        ctx.closePath();
+        ctx.fillStyle = i%2? '#0e1521' : '#0c121d';
+        ctx.fill();
+      }
+
+      // Líneas de casa
+      ctx.strokeStyle = '#223048'; ctx.lineWidth = 2;
+      for(let i=0;i<12;i++){
+        const ang = Math.PI + (i*30)*Math.PI/180;
+        ctx.beginPath();
+        ctx.moveTo(cx,cy);
+        ctx.lineTo(cx + R*Math.cos(ang), cy + R*Math.sin(ang));
+        ctx.stroke();
+      }
+
+      // Bisel interno
+      ctx.beginPath(); ctx.arc(cx,cy,rHouse,0,Math.PI*2); ctx.strokeStyle='#2a3b58'; ctx.lineWidth=2; ctx.stroke();
+
+      // Signos en el borde externo, empezando por el signo del ASC
+      for(let i=0;i<12;i++){
+        const ang = Math.PI + ((i+0.5)*30)*Math.PI/180;
+        const x = cx + rSigns*Math.cos(ang), y = cy + rSigns*Math.sin(ang)+6;
+        const signIndex = (data.ascSign + i) % 12;
+        ctx.fillStyle = '#cfe7ff';
+        ctx.font = '28px system-ui,Segoe UI Symbol,Apple Color Emoji';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText(signGlyph[signIndex], x, y);
+      }
+
+      // Marcas ASC / MC / DC / IC
+      const mark = (label, lon, color) =>{
+        const rel = norm(lon - data.house0);
+        const ang = Math.PI + rel*Math.PI/180;
+        ctx.strokeStyle = color; ctx.lineWidth=3.5;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx + R*Math.cos(ang), cy + R*Math.sin(ang)); ctx.stroke();
+        // etiqueta
+        ctx.save();
+        ctx.translate(cx + (R+20)*Math.cos(ang), cy + (R+20)*Math.sin(ang));
+        ctx.rotate(ang+Math.PI/2);
+        ctx.fillStyle = color; ctx.font = 'bold 12px system-ui'; ctx.textAlign='center';
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+      };
+      mark('ASC', data.house0, '#7CFFB6');
+      mark('MC', data.mc, '#ffd166');
+      mark('DC', norm(data.house0+180), '#7CFFB6');
+      mark('IC', norm(data.mc+180), '#ffd166');
+
+      // Planetas
+      for(const p of data.planets){
+        const rel = norm(p.lon - data.house0);
+        const ang = Math.PI + rel*Math.PI/180;
+        const x = cx + rPlan*Math.cos(ang), y = cy + rPlan*Math.sin(ang);
+        // punto
+        ctx.beginPath(); ctx.arc(x,y,10,0,Math.PI*2); ctx.fillStyle = '#152033'; ctx.fill(); ctx.strokeStyle='#3b517a'; ctx.lineWidth=2; ctx.stroke();
+        // glifo
+        ctx.fillStyle = '#eaf3ff'; ctx.font='18px "Segoe UI Symbol", system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(p.glyph, x, y);
+      }
+
+      // Anillo interior
+      ctx.beginPath(); ctx.arc(cx,cy,180,0,Math.PI*2); ctx.strokeStyle='#24324b'; ctx.lineWidth=2; ctx.stroke();
+    }
+
+    function update(){
+      const name = $('#name').value.trim();
+      const dateStr = $('#date').value; const timeStr = $('#time').value || '12:00';
+      const tz = parseFloat($('#tz').value || '0');
+      const lat = parseFloat($('#lat').value); const lon = parseFloat($('#lon').value);
+      if(!dateStr || isNaN(lat) || isNaN(lon)){ $('#status').textContent = '→ Falta fecha y/o coordenadas.'; return; }
+
+      const [Y,M,D] = dateStr.split('-').map(Number);
+      const [hh,mm] = timeStr.split(':').map(Number);
+      const utc = new Date(Date.UTC(Y, M-1, D, hh - tz, mm||0, 0));
+      const astroTime = new Astronomy.AstroTime(utc);
+
+      // Longitudes planetarias
+      const planets = planetList.map(p=>{
+        const lon = eclipticLongitude(p.key, astroTime);
+        return {name:p.name, key:p.key, lon, glyph:p.glyph};
+      });
+
+      // Ascendente / MC
+      const asc = ascendantLongitude(utc, lat, lon);
+      const mc = midheavenLongitude(utc, lon);
+      const ascSign = Math.floor(asc/30);
+      const house0 = ascSign*30; // Whole Sign: 1ª casa arranca a 0° del signo ascendente
+
+      // Dibujar
+      drawChart({planets, house0, asc, mc, ascSign});
+
+      // Leyenda
+      const ro = $('#readout'); ro.innerHTML = '';
+      const hdr = document.createElement('div');
+      hdr.innerHTML = `<b>${name||'Carta natal'}</b><br><span class="muted">${dateStr} ${timeStr} (UTC${tz>=0?'+':''}${tz}), lat ${lat.toFixed(4)}°, lon ${lon.toFixed(4)}°</span><br>Ascendente: <b>${formatZodiac(asc)}</b> · MC: <b>${formatZodiac(mc)}</b>`;
+      hdr.style.gridColumn = '1 / -1'; ro.appendChild(hdr);
+      for(const p of planets){
+        const d = document.createElement('div');
+        d.innerHTML = `<div class="inline"><span class="pill">${p.glyph} ${p.name}</span><span class="muted">${formatZodiac(p.lon)}</span></div>`;
+        ro.appendChild(d);
+      }
+
+      $('#status').textContent = '';
+    }
+
+    // Geocoder básico (Nominatim OSM)
+    async function geocode(){
+      const q = $('#q').value.trim(); if(!q){return}
+      $('#status').textContent = 'Buscando…';
+      try{
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`;
+        const res = await fetch(url, {headers:{'Accept-Language':'es'}});
+        const arr = await res.json();
+        if(arr && arr.length){
+          $('#lat').value = parseFloat(arr[0].lat).toFixed(6);
+          $('#lon').value = parseFloat(arr[0].lon).toFixed(6);
+          $('#status').textContent = `📍 ${arr[0].display_name}`;
+        }else{
+          $('#status').textContent = 'No encontrado.';
+        }
+      }catch(err){
+        $('#status').textContent = 'Error de red al geocodificar.';
+      }
+    }
+
+    // Defaults: ahora/aquí
+    function fillNow(){
+      const d = new Date();
+      const off = -d.getTimezoneOffset()/60; // horas
+      $('#tz').value = off.toFixed(2);
+      $('#date').valueAsDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      $('#time').value = `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      // Intentar Geolocation del navegador
+      if(navigator.geolocation){
+        navigator.geolocation.getCurrentPosition(pos=>{
+          $('#lat').value = pos.coords.latitude.toFixed(6);
+          $('#lon').value = pos.coords.longitude.toFixed(6);
+          $('#status').textContent = 'Coordenadas obtenidas del dispositivo.';
+        }, _=>{}, {enableHighAccuracy:true, timeout:4000});
+      }
+    }
+
+    $('#btnGeo').addEventListener('click', geocode);
+    $('#btnDraw').addEventListener('click', update);
+    $('#btnNow').addEventListener('click', ()=>{ fillNow(); $('#status').textContent=''; });
+
+    // Inicializar
+    fillNow();
+  </script>
+</body>
+</html>
