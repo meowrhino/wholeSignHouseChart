@@ -6,12 +6,40 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>carta natal — whole sign (html único)</title>
   <!--
-    v7.3 — fondo de estrellas + tipografía de signos sin emoji + tabla en una columna
-    - Fondo cósmico con canvas de estrellas (basado en tu index.html) fijo detrás de todo.
-    - Signos del zodiaco forzados a glifo de **texto** (no emoji) usando VS-15 y fuentes de símbolos.
-    - Leyendas/tablas en **una columna** (planetas, aspectos, casas) sin scroll ni separadores.
-    - Párrafos intro explicativos: dignidades, aspectos, ángulos (asc/mc/dc/ic) y casas (helenístico).
-    - Mantiene los tests y el fix previo de `data`.
+    v10.1 — estética "grimorio editorial" (solo presentación, la lógica no cambia)
+    - paneles translúcidos con blur: las estrellas se ven detrás del formulario y la rueda.
+    - jerarquía tipográfica: secciones con ornamento ✦ y hairline dorado, números tabulares,
+      filas de datos alineadas, formulario a dos columnas en desktop, subrayado animado al foco.
+    - rueda: ticks de grados (5°/10°/30°) en el borde, glow sutil en los ejes dorados,
+      transición suave formulario → carta.
+    - cielo generativo: parallax al hacer scroll, estrellas fugaces ocasionales y constelaciones
+      que se iluminan cerca del cursor (todo desactivado con prefers-reduced-motion).
+
+    v10.0 — biblioteca, cielo ahora y tránsitos (todo opcional; el defecto no cambia)
+    - "guardar carta": biblioteca de cartas en localStorage con export/import json.
+    - "cielo ahora": dibuja el cielo del momento; si no hay coordenadas, carta sin casas ni asc.
+    - tránsitos: anillo exterior (biwheel) con los planetas de cualquier fecha sobre la carta
+      natal + lista de aspectos tránsito→natal por grado (orbe máx. 3°). chip para ocultar.
+
+    v9.0 — modo avanzado por capas (astro.com-style): el defecto sigue simple
+    - "más opciones" (desplegable, oculto por defecto): objetos adicionales (nodos lunares,
+      lilith, quirón ≈, parte de la fortuna), sistema de casas (whole sign / igual / placidus),
+      aspectos por signo o por grado (con orbe ajustable) y detalles tradicionales
+      (retrogradación ℞, secta diurna/nocturna). Todo opcional; la carta por defecto no cambia.
+    - Chips de capas en la presentación: mostrar/ocultar aspectos, objetos y ángulos sin re-editar.
+    - Placidus verificado (c1=asc, c10=mc, oposiciones exactas). Quirón por elementos JPL (aprox.).
+    - Rueda de doble anillo cuando casas ≠ whole (signos y casas independientes).
+
+    v8.0 — rueda SVG interactiva + url compartible
+    - La rueda pasa de canvas a **SVG interactivo**: hover/tap en planetas muestra tooltip
+      (signo, grado, dignidad, casa) y resalta solo sus aspectos; hover en líneas de aspecto
+      y en sectores de casa también informa.
+    - **Anti-colisión**: planetas en grados cercanos se escalonan radialmente (adiós solapes ☉/☿).
+    - Animación de entrada (sectores → planetas → aspectos), desactivada con prefers-reduced-motion.
+    - **URL compartible**: al dibujar, los datos van a la query string; abrir el enlace redibuja la carta.
+      Botón "compartir enlace" en la barra.
+    - Export PNG ahora incluye cabecera con nombre/fecha/coordenadas.
+    - Mantiene: fondo de estrellas, glifos de texto (VS-15), tablas en una columna, tests.
   -->
   <link
     href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Spectral+SC:wght@600;700&display=swap"
@@ -44,6 +72,7 @@
       background: transparent;
       color: var(--ink);
       font: 16px/1.55 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      font-variant-numeric: tabular-nums;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
     }
@@ -88,15 +117,37 @@
     .panel {
       max-width: 720px;
       margin: 0 auto;
-      padding: 8px 4px 24px
+      padding: 34px 38px 40px;
+      background: rgba(13, 9, 26, .55);
+      border: 1px solid rgba(255, 213, 74, .14);
+      border-radius: 18px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      animation: chartFade .4s ease
+    }
+
+    @media (max-width: 640px) {
+      .panel {
+        padding: 22px 16px 28px
+      }
     }
 
     h1 {
       font-family: 'Spectral SC', Georgia, serif;
       font-weight: 700;
-      letter-spacing: .02em;
-      font-size: 30px;
-      margin: 0 0 18px 0
+      letter-spacing: .05em;
+      font-size: 32px;
+      margin: 0 0 26px 0;
+      color: var(--gold-weak)
+    }
+
+    h1::before {
+      content: '✦';
+      color: var(--gold);
+      font-size: 16px;
+      margin-right: 12px;
+      vertical-align: 6px;
+      opacity: .8
     }
 
     label {
@@ -115,19 +166,35 @@
       border-bottom: 1px solid rgba(183, 172, 214, .25);
       background: transparent;
       color: var(--ink);
-      border-radius: 0
+      border-radius: 0;
+      background-image: linear-gradient(var(--gold), var(--gold));
+      background-repeat: no-repeat;
+      background-position: left bottom;
+      background-size: 0% 1.5px;
+      transition: background-size .35s ease
     }
 
     input:focus,
     select:focus {
       outline: none;
-      border-bottom-color: var(--gold)
+      background-size: 100% 1.5px
     }
 
     .row {
       display: grid;
       gap: 22px;
       grid-template-columns: 1fr
+    }
+
+    @media (min-width: 700px) {
+      .row {
+        grid-template-columns: 1fr 1fr;
+        align-items: start
+      }
+
+      .row > button {
+        justify-self: start
+      }
     }
 
     .muted {
@@ -293,8 +360,33 @@
     }
 
     .section {
-      margin-top: 40px;
-      padding-top: 6px
+      margin-top: 54px;
+      padding-top: 26px;
+      border-top: 1px solid rgba(255, 213, 74, .09)
+    }
+
+    .section > .serif:first-child {
+      font-size: 19px;
+      color: var(--gold-weak)
+    }
+
+    .section > .serif:first-child::before {
+      content: '✦';
+      font-size: 12px;
+      color: var(--gold);
+      opacity: .75;
+      margin-right: 10px;
+      vertical-align: 2px
+    }
+
+    #summary {
+      background: rgba(13, 9, 26, .6);
+      border: 1px solid rgba(255, 213, 74, .16);
+      border-radius: 14px;
+      padding: 18px 22px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      font-size: 17px
     }
 
     .legend {
@@ -303,23 +395,131 @@
       gap: 10px
     }
 
-    .legend div {
-      padding: 4px 0
+    .legend > div {
+      padding: 8px 2px;
+      border-bottom: 1px solid rgba(255, 213, 74, .07)
+    }
+
+    .legend > div:last-child {
+      border-bottom: none
+    }
+
+    #readout > div > div > span:first-child {
+      display: inline-block;
+      min-width: 140px
     }
 
     .serif {
       font-family: 'Spectral SC', 'Cormorant Garamond', Georgia, serif
     }
 
-    canvas#chart {
+    #chartBox {
+      position: relative
+    }
+
+    svg#chartSvg {
       width: 100%;
       height: auto;
       background:
         radial-gradient(900px 900px at 50% 35%, rgba(255, 255, 255, .04), rgba(0, 0, 0, 0)),
         radial-gradient(1400px 900px at 50% -20%, rgba(77, 45, 155, .18), rgba(0, 0, 0, 0)),
-        #0a0715;
+        rgba(10, 7, 21, .42);
+      border: 1px solid rgba(255, 213, 74, .13);
       border-radius: 14px;
       display: block
+    }
+
+    /* interacción de la rueda */
+    #chartSvg .node,
+    #chartSvg .asp,
+    #chartSvg .sector {
+      cursor: pointer
+    }
+
+    #chartSvg .node,
+    #chartSvg .asp {
+      transition: opacity .18s ease
+    }
+
+    #chartSvg.focus .asp {
+      opacity: .07
+    }
+
+    #chartSvg.focus .asp.hot {
+      opacity: 1
+    }
+
+    #chartSvg.focus .node {
+      opacity: .3
+    }
+
+    #chartSvg.focus .node.hot {
+      opacity: 1
+    }
+
+    #chartSvg .sector:hover {
+      filter: brightness(1.8)
+    }
+
+    /* tooltip de la rueda */
+    #tip {
+      position: absolute;
+      z-index: 3;
+      pointer-events: none;
+      background: rgba(13, 9, 26, .96);
+      border: 1px solid rgba(255, 213, 74, .35);
+      border-radius: 10px;
+      padding: 8px 12px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--ink);
+      max-width: 260px;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, .55);
+      text-transform: lowercase
+    }
+
+    /* animación de entrada de la rueda */
+    @keyframes chartFade {
+      from { opacity: 0 }
+      to { opacity: 1 }
+    }
+
+    @keyframes chartDraw {
+      to { stroke-dashoffset: 0 }
+    }
+
+    @keyframes chartPop {
+      from { opacity: 0; transform: scale(.2) }
+      to { opacity: 1; transform: scale(1) }
+    }
+
+    #chartSvg .sector {
+      animation: chartFade .5s ease backwards;
+      animation-delay: calc(var(--i) * 35ms)
+    }
+
+    #chartSvg .aspline {
+      stroke-dasharray: 1;
+      stroke-dashoffset: 1;
+      animation: chartDraw .7s ease forwards;
+      animation-delay: calc(.4s + var(--i) * 45ms)
+    }
+
+    #chartSvg .node {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: chartPop .5s cubic-bezier(.34, 1.56, .64, 1) backwards;
+      animation-delay: calc(.25s + var(--i) * 60ms)
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      #chartSvg .sector,
+      #chartSvg .aspline,
+      #chartSvg .node {
+        animation: none;
+        stroke-dashoffset: 0
+      }
     }
 
     .mini {
@@ -337,8 +537,149 @@
     }
 
     body.presentation #chartZone {
-      display: block
+      display: block;
+      animation: chartFade .5s ease
     }
+    /* modo avanzado (desplegable) */
+    .advBar {
+      display: flex;
+      justify-content: center;
+      margin-top: 26px
+    }
+
+    .advLink {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font: inherit;
+      font-size: 14px;
+      letter-spacing: .02em;
+      text-transform: lowercase;
+      padding: 6px 10px;
+      opacity: .8;
+      transition: color .15s, opacity .15s
+    }
+
+    .advLink:hover {
+      color: var(--gold);
+      opacity: 1
+    }
+
+    .advLink .chev {
+      display: inline-block;
+      transition: transform .2s ease;
+      margin-left: 4px
+    }
+
+    .advLink[aria-expanded="true"] .chev {
+      transform: rotate(180deg)
+    }
+
+    #advPanel[hidden] {
+      display: none
+    }
+
+    #advPanel {
+      margin-top: 8px;
+      padding: 4px 2px 2px;
+      animation: chartFade .25s ease
+    }
+
+    .advGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 18px
+    }
+
+    input[type="range"] {
+      accent-color: var(--gold);
+      padding: 0;
+      margin-top: 6px;
+      background-image: none;
+      border-bottom: none
+    }
+
+    /* chips de capas (presentación) */
+    #layerChips {
+      display: none;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      margin: 14px 0 2px
+    }
+
+    body.presentation #layerChips {
+      display: flex
+    }
+
+    .chip {
+      background: rgba(183, 172, 214, .08);
+      border: 1px solid rgba(183, 172, 214, .22);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 5px 13px;
+      font-size: 13px;
+      letter-spacing: .02em;
+      text-transform: lowercase;
+      cursor: pointer;
+      user-select: none;
+      transition: all .15s ease
+    }
+
+    .chip.on {
+      background: rgba(255, 213, 74, .13);
+      border-color: rgba(255, 213, 74, .5);
+      color: var(--gold)
+    }
+
+    .chip:hover {
+      border-color: rgba(255, 213, 74, .45)
+    }
+
+    /* capas ocultables de la rueda */
+    #chartSvg.hide-asp .asp,
+    #chartSvg.hide-obj .node.obj,
+    #chartSvg.hide-ang .angle,
+    #chartSvg.hide-tr .tr {
+      display: none
+    }
+
+    /* biblioteca de cartas */
+    .libRow {
+      display: flex;
+      align-items: baseline;
+      gap: 8px
+    }
+
+    .libLoad {
+      background: none;
+      border: none;
+      color: var(--ink);
+      cursor: pointer;
+      font: inherit;
+      text-align: left;
+      text-transform: lowercase;
+      padding: 2px 0
+    }
+
+    .libLoad:hover {
+      color: var(--gold)
+    }
+
+    .libDel {
+      background: none;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 15px;
+      padding: 2px 6px
+    }
+
+    .libDel:hover {
+      color: var(--err)
+    }
+
   </style>
 </head>
 
@@ -352,6 +693,8 @@
       <div class="brand serif">☿ carta natal — whole sign</div>
       <div class="actions">
         <button id="btnBack" class="link">editar</button>
+        <button id="btnSaveTop" class="link">guardar</button>
+        <button id="btnShare" class="link">compartir enlace</button>
         <button id="btnExport" class="link">exportar png</button>
       </div>
     </div>
@@ -435,13 +778,76 @@
         </div>
       </div>
 
+      <div class="advBar">
+        <button type="button" id="btnAdv" class="advLink" aria-expanded="false">más opciones <span
+            class="chev">▾</span></button>
+      </div>
+      <div id="advPanel" hidden>
+        <label>objetos adicionales</label>
+        <div class="toggles advGrid">
+          <label class="toggle" id="tglNodes"><input type="checkbox" id="objNodes"><span class="lbl">nodos
+              lunares</span><span class="pill">off</span></label>
+          <label class="toggle" id="tglLilith"><input type="checkbox" id="objLilith"><span
+              class="lbl">lilith</span><span class="pill">off</span></label>
+          <label class="toggle" id="tglChiron"><input type="checkbox" id="objChiron"><span class="lbl">quirón
+              ≈</span><span class="pill">off</span></label>
+          <label class="toggle" id="tglFortune"><input type="checkbox" id="objFortune"><span class="lbl">parte de la
+              fortuna</span><span class="pill">off</span></label>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>sistema de casas</label>
+            <select id="houseSystem">
+              <option value="whole" selected>whole sign (por defecto)</option>
+              <option value="equal">igual (equal)</option>
+              <option value="placidus">placidus</option>
+            </select>
+          </div>
+          <div>
+            <label>aspectos</label>
+            <select id="aspectMode">
+              <option value="sign" selected>por signos (whole sign)</option>
+              <option value="degree">por grado (con orbe)</option>
+            </select>
+            <div id="orbRow" style="display:none; margin-top:10px">
+              <label style="margin:0">orbe máximo: <b id="orbVal">6</b>°</label>
+              <input type="range" id="orbMax" min="1" max="10" step="0.5" value="6" style="width:100%">
+            </div>
+          </div>
+        </div>
+
+        <label>detalles tradicionales</label>
+        <div class="toggles">
+          <label class="toggle" id="tglRetro"><input type="checkbox" id="tradRetro"><span class="lbl">marca de
+              retrogradación ℞</span><span class="pill">off</span></label>
+          <label class="toggle" id="tglSect"><input type="checkbox" id="tradSect"><span class="lbl">secta
+              diurna/nocturna</span><span class="pill">off</span></label>
+        </div>
+        <div class="mini" style="margin-top:10px">todo esto es opcional: por defecto la carta se mantiene simple (whole
+          sign, aspectos por signos). enciende sólo lo que quieras ver.</div>
+      </div>
+
       <div class="actionsPrimary">
         <button id="btnDraw" class="btnPrimary">dibujar carta</button>
       </div>
       <div class="actionsSecondary">
         <button id="btnNow" class="btnSecondary">usar aquí y ahora</button>
+        <button id="btnSkyNow" class="btnSecondary">cielo ahora</button>
+        <button id="btnSave" class="btnSecondary">guardar carta</button>
         <button id="btnTest" class="btnSecondary">autotest</button>
         <button id="btnExample" class="btnSecondary">cargar ejemplo</button>
+      </div>
+
+      <div class="section" id="libraryBox">
+        <div class="serif" style="letter-spacing:.04em; margin-bottom:6px">cartas guardadas <span class="mini">(en este
+            navegador)</span></div>
+        <div id="libraryList" class="legend"></div>
+        <div class="actionsSecondary" style="justify-content:flex-start; margin-top:10px">
+          <button id="btnExportLib" class="btnSecondary" style="font-size:14px">exportar json</button>
+          <button id="btnImportLib" class="btnSecondary" style="font-size:14px">importar json</button>
+        </div>
+        <input type="file" id="fileImport" accept=".json,application/json" hidden>
       </div>
 
       <div class="tip">el selector de zona horaria usa ciudades (<i>iana</i>) y ajusta dst automáticamente. si no carga
@@ -453,9 +859,35 @@
 
   <!-- Carta (presentación) -->
   <div class="wrap canvasWrap" id="chartZone">
-    <canvas id="chart" width="1120" height="1120"></canvas>
+    <div id="chartBox">
+      <svg id="chartSvg" viewBox="0 0 1120 1120" xmlns="http://www.w3.org/2000/svg"></svg>
+      <div id="tip" hidden></div>
+    </div>
+
+    <div id="layerChips"></div>
 
     <div class="section" id="summary"></div>
+
+    <div class="section" id="transitBox">
+      <div class="serif" style="letter-spacing:.04em; margin-bottom:6px">tránsitos <span class="mini">(el cielo de un
+          momento sobre esta carta)</span></div>
+      <div class="toggles">
+        <label class="toggle" id="tglTr"><input type="checkbox" id="chkTr"><span class="lbl">mostrar
+            tránsitos</span><span class="pill">off</span></label>
+      </div>
+      <div id="trCtrl" style="display:none">
+        <div class="row">
+          <div><label>fecha del tránsito</label><input id="trDate" type="date"></div>
+          <div><label>hora del tránsito</label><input id="trTime" type="time" step="60"></div>
+        </div>
+        <div class="actionsSecondary" style="justify-content:flex-start; margin-top:8px">
+          <button id="btnTrNow" class="btnSecondary" style="font-size:14px">usar ahora</button>
+        </div>
+        <div class="mini" style="margin-top:10px">anillo exterior: planetas del momento elegido. aspectos
+          tránsito→natal <b>por grado</b>, orbe máx. 3°.</div>
+        <div id="trAspects" class="legend" style="margin-top:12px"></div>
+      </div>
+    </div>
 
     <div class="section">
       <div class="serif" style="letter-spacing:.04em; margin-bottom:6px">qué estás viendo</div>
@@ -500,6 +932,8 @@
     const $ = sel => document.querySelector(sel);
     function setStatus(msg, kind = 'info') { const el = $('#status'); if (!el) return; el.textContent = msg; el.style.color = (kind === 'error' ? '#ff6b6b' : 'var(--muted)'); }
     function roman(n) { const R = ['', 'i', 'ii', 'iii', 'iv', 'v', 'vi', 'vii', 'viii', 'ix', 'x', 'xi', 'xii']; return R[n] || String(n); }
+    const SIGN_NAMES = ['aries', 'tauro', 'géminis', 'cáncer', 'leo', 'virgo', 'libra', 'escorpio', 'sagitario', 'capricornio', 'acuario', 'piscis'];
+    const SIGN_GLYPHS = ['♈︎', '♉︎', '♊︎', '♋︎', '♌︎', '♍︎', '♎︎', '♏︎', '♐︎', '♑︎', '♒︎', '♓︎'];
 
     // Loader Astronomy Engine
     async function loadAstronomy() {
@@ -525,7 +959,7 @@
     function midheavenLongitude(dateUTC, lonDeg) { const eps = deg2rad(obliquityEcliptic(dateUTC)); const thetaL = deg2rad(gmstHours(dateUTC) * 15 + lonDeg); return norm(rad2deg(Math.atan2(Math.sin(thetaL), Math.cos(thetaL) * Math.cos(eps)))); }
 
     function eclipticLongitude(bodyKey, astroTime) { let vec; if (bodyKey === 'Moon') vec = Astronomy.GeoMoon(astroTime); else vec = Astronomy.GeoVector(bodyKey, astroTime, true); const eps = deg2rad(obliquityEcliptic(astroTime.date)); const x = vec.x, y = vec.y, z = vec.z; const ye = y * Math.cos(eps) + z * Math.sin(eps); const xe = x; return norm(rad2deg(Math.atan2(ye, xe))); }
-    function formatZodiac(lon) { const s = Math.floor(lon / 30); const deg = Math.floor(lon - s * 30); const min = Math.floor((lon - s * 30 - deg) * 60); const glyph = ['\u2648\uFE0E', '\u2649\uFE0E', '\u264A\uFE0E', '\u264B\uFE0E', '\u264C\uFE0E', '\u264D\uFE0E', '\u264E\uFE0E', '\u264F\uFE0E', '\u2650\uFE0E', '\u2651\uFE0E', '\u2652\uFE0E', '\u2653\uFE0E'][s]; const names = ['aries', 'tauro', 'géminis', 'cáncer', 'leo', 'virgo', 'libra', 'escorpio', 'sagitario', 'capricornio', 'acuario', 'piscis']; return `${deg}°${min.toString().padStart(2, '0')} ${glyph} (${names[s]})`; }
+    function formatZodiac(lon) { const s = Math.floor(lon / 30); const deg = Math.floor(lon - s * 30); const min = Math.floor((lon - s * 30 - deg) * 60); return `${deg}°${min.toString().padStart(2, '0')} ${SIGN_GLYPHS[s]} (${SIGN_NAMES[s]})`; }
 
     // Dignidades tradicionales (clásicas)
     const RULERS = { 0: 'Mars', 1: 'Venus', 2: 'Mercury', 3: 'Moon', 4: 'Sun', 5: 'Mercury', 6: 'Venus', 7: 'Mars', 8: 'Jupiter', 9: 'Saturn', 10: 'Saturn', 11: 'Jupiter' };
@@ -536,68 +970,299 @@
     // Aspecto por signos (Whole Sign) usando distancia mínima entre signos.
     function aspectBySigns(signA, signB) { const d = ((signB - signA) % 12 + 12) % 12; const md = Math.min(d, 12 - d); if (md === 2) return { type: 'sextil', colorName: 'darkblue' }; if (md === 3) return { type: 'cuadratura', colorName: 'burgundy' }; if (md === 4) return { type: 'trígono', colorName: 'blue' }; if (md === 6) return { type: 'oposición', colorName: 'red' }; return null; }
 
-    // Dibujo (CCW, I a la izquierda)
-    function drawChart(data) {
-      const canvas = $('#chart'); const ctx = canvas.getContext('2d');
-      const W = canvas.width, H = canvas.height; ctx.clearRect(0, 0, W, H);
-      const cx = W / 2, cy = H / 2; const R = 480, rHouse = 410, rPlan = 330, rSigns = 445, rNums = 235;
+    // ===== Avanzado: objetos, detalles y sistemas de casas =====
+    // Aspectos por grado (con orbe). Añade la conjunción, que "por signos" no puede expresar.
+    const ASPECT_DEFS = [
+      { ang: 0, type: 'conjunción', colorName: 'gold' },
+      { ang: 60, type: 'sextil', colorName: 'darkblue' },
+      { ang: 90, type: 'cuadratura', colorName: 'burgundy' },
+      { ang: 120, type: 'trígono', colorName: 'blue' },
+      { ang: 180, type: 'oposición', colorName: 'red' }
+    ];
+    function aspectByDegree(lonA, lonB, orbMax) {
+      let d = Math.abs(norm(lonA - lonB)); if (d > 180) d = 360 - d;
+      let best = null;
+      for (const A of ASPECT_DEFS) { const orb = Math.abs(d - A.ang); if (orb <= orbMax && (!best || orb < best.orb)) best = { type: A.type, colorName: A.colorName, orb }; }
+      return best;
+    }
 
-      // Fondo del canvas rueda (queda encima del fondo de estrellas de la página)
-      ctx.save(); ctx.fillStyle = '#0a0715'; ctx.fillRect(0, 0, W, H); for (let i = 0; i < 120; i++) { const x = Math.random() * W, y = Math.random() * H, r = Math.random() * 1.1; ctx.globalAlpha = Math.random() * 0.6 + 0.2; ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fillStyle = 'rgba(255,244,196,.9)'; ctx.fill(); } ctx.globalAlpha = 1; ctx.restore();
+    // Nodo lunar medio (norte) y Lilith media (apogeo lunar). Fórmulas de Meeus, T = siglos julianos desde J2000.
+    function meanNodeLon(dateUTC) { const T = julianCenturies(dateUTC); return norm(125.0445479 - 1934.1362891 * T + 0.0020754 * T * T + T * T * T / 467441 - T * T * T * T / 60616000); }
+    function meanLilithLon(dateUTC) { const T = julianCenturies(dateUTC); const peri = 83.3532465 + 4069.0137287 * T - 0.0103200 * T * T - T * T * T / 80053 + T * T * T * T / 18999000; return norm(peri + 180); }
 
-      const base = Math.PI; // izquierda (Este)
-      const toAngRel = relDeg => base - relDeg * Math.PI / 180; // CCW
-      const SYMBOL_FONT = '600 22px "Noto Sans Symbols 2","Segoe UI Symbol","DejaVu Sans","Symbola",sans-serif';
-      const PLANET_FONT = '600 20px "Noto Sans Symbols 2","Segoe UI Symbol","DejaVu Sans","Symbola",sans-serif';
+    // Quirón: propagación kepleriana de dos cuerpos desde elementos osculadores de JPL (aproximado, marcado con ≈).
+    const CHIRON_EL = { epoch: 2461200.5, a: 13.68426760850124, e: 0.3797656311453571, i: 6.930574468846328, om: 209.2961258613147, w: 339.2878326589729, M0: 216.7198966018106, n: 0.0194702593257484 };
+    function solveKepler(M, e) { M = ((M % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI); let E = M; for (let k = 0; k < 60; k++) { const dE = (E - e * Math.sin(E) - M) / (1 - e * Math.cos(E)); E -= dE; if (Math.abs(dE) < 1e-10) break; } return E; }
+    function chironLon(astroTime) {
+      const jd = astroTime.tt + 2451545.0; const el = CHIRON_EL;
+      const M = deg2rad(el.M0 + el.n * (jd - el.epoch));
+      const E = solveKepler(M, el.e);
+      const xv = el.a * (Math.cos(E) - el.e), yv = el.a * Math.sqrt(1 - el.e * el.e) * Math.sin(E);
+      const om = deg2rad(el.om), w = deg2rad(el.w), inc = deg2rad(el.i);
+      const cosom = Math.cos(om), sinom = Math.sin(om), cosw = Math.cos(w), sinw = Math.sin(w), cosi = Math.cos(inc), sini = Math.sin(inc);
+      // heliocéntrico eclíptico J2000
+      const xh = (cosom * cosw - sinom * sinw * cosi) * xv + (-cosom * sinw - sinom * cosw * cosi) * yv;
+      const yh = (sinom * cosw + cosom * sinw * cosi) * xv + (-sinom * sinw + cosom * cosw * cosi) * yv;
+      // Tierra heliocéntrica del engine (ecuatorial J2000) → eclíptica J2000
+      const earth = Astronomy.HelioVector(Astronomy.Body.Earth, astroTime);
+      const eps0 = deg2rad(23.4392911);
+      const exe = earth.x, eye = earth.y * Math.cos(eps0) + earth.z * Math.sin(eps0);
+      // geocéntrico eclíptico J2000 → longitud, + precesión general a eclíptica de fecha (tropical)
+      const gx = xh - exe, gy = yh - eye;
+      const T = (jd - 2451545.0) / 36525;
+      return norm(rad2deg(Math.atan2(gy, gx)) + 1.396971 * T);
+    }
 
-      // Rueda de casas (si hay hora o si hay ascendente sospechado)
-      if (!data.unknownTime || data.suspectAscSign != null) {
+    // Retrogradación: la longitud eclíptica decrece un día después. Sol y Luna nunca retrogradan.
+    function isRetro(bodyKey, astroTime) { if (bodyKey === 'Sun' || bodyKey === 'Moon') return false; const l1 = eclipticLongitude(bodyKey, astroTime); const l2 = eclipticLongitude(bodyKey, astroTime.AddDays(1)); let d = l2 - l1; if (d > 180) d -= 360; if (d < -180) d += 360; return d < 0; }
+
+    // Secta: carta diurna si el Sol está sobre el horizonte (por encima del eje asc-dc).
+    function isDiurnal(sunLon, ascDeg) { return norm(sunLon - ascDeg) > 180; }
+
+    // Cúspides de casas por sistema. Devuelve 12 longitudes absolutas (cúspide de cada casa).
+    function equalCusps(ascDeg) { return Array.from({ length: 12 }, (_, i) => norm(ascDeg + 30 * i)); }
+    function wholeCusps(ascSign) { return Array.from({ length: 12 }, (_, i) => norm((ascSign + i) * 30)); }
+    function placidusCusps(dateUTC, latDeg, lonDeg, ascDeg, mcLon) {
+      const eps = deg2rad(obliquityEcliptic(dateUTC)); const phi = deg2rad(latDeg);
+      const ramc = deg2rad(norm(gmstHours(dateUTC) * 15 + lonDeg));
+      const semiArc = ra => { const decl = Math.atan(Math.tan(eps) * Math.sin(ra)); let x = -Math.tan(phi) * Math.tan(decl); x = Math.max(-1, Math.min(1, x)); return Math.acos(x); };
+      const raToLon = ra => norm(rad2deg(Math.atan2(Math.sin(ra), Math.cos(ra) * Math.cos(eps))));
+      const upper = (m, off) => { let ra = ramc + deg2rad(off); for (let k = 0; k < 30; k++) ra = ramc + m * semiArc(ra); return raToLon(ra); };
+      const lower = (m, off) => { let ra = ramc + deg2rad(off); for (let k = 0; k < 30; k++) ra = ramc + Math.PI - m * (Math.PI - semiArc(ra)); return raToLon(ra); };
+      const c = new Array(12);
+      c[0] = norm(ascDeg); c[9] = norm(mcLon); c[6] = norm(ascDeg + 180); c[3] = norm(mcLon + 180);
+      c[10] = upper(1 / 3, 30); c[11] = upper(2 / 3, 60); // casas 11, 12
+      c[1] = lower(2 / 3, 120); c[2] = lower(1 / 3, 150);  // casas 2, 3
+      c[4] = norm(c[10] + 180); c[5] = norm(c[11] + 180);  // casas 5, 6 opuestas a 11, 12
+      c[7] = norm(c[1] + 180); c[8] = norm(c[2] + 180);    // casas 8, 9 opuestas a 2, 3
+      return c;
+    }
+    // Asigna puntos (planetas/objetos) a casas por cúspides: casa i si la longitud cae en [cusp[i], cusp[i+1]).
+    function assignHousesByCusps(points, cusps) {
+      const houses = cusps.map(cl => ({ cuspLon: cl, planets: [] }));
+      for (const p of points) { for (let h = 0; h < 12; h++) { const span = norm(cusps[(h + 1) % 12] - cusps[h]); const off = norm(p.lon - cusps[h]); if (off < span) { houses[h].planets.push(p); break; } } }
+      return houses;
+    }
+
+    // ===== Rueda SVG interactiva =====
+    const CHART_UI = { nodeInfo: {}, houseInfo: [] };
+    let exportMeta = { line1: 'carta natal', line2: '' };
+
+    function cssColor(name) { return (getComputedStyle(document.documentElement).getPropertyValue(`--${name}`) || '#fff').trim(); }
+
+    function renderChart(data) {
+      const svg = $('#chartSvg');
+      const CX = 560, CY = 560, R = 480, R_HOUSE = 410, R_PLAN = 330, R_SIGNS = 445, R_NUMS = 235;
+      const toAng = rel => Math.PI - rel * Math.PI / 180; // CCW, casa i a la izquierda
+      const PX = (r, a) => (CX + r * Math.cos(a)).toFixed(1);
+      const PY = (r, a) => (CY + r * Math.sin(a)).toFixed(1);
+      const SYM_FONT = "'Noto Sans Symbols 2','Segoe UI Symbol','DejaVu Sans','Symbola',sans-serif";
+      const relOf = lon => norm(lon - data.house0);
+      const out = [];
+      CHART_UI.nodeInfo = {}; CHART_UI.houseInfo = [];
+      const cusps = data.cusps; // 12 longitudes absolutas, o null si noHouses
+
+      // fondo + estrellitas (dentro del svg → salen también en el png exportado)
+      out.push('<defs><filter id="glowGold" x="-60%" y="-60%" width="220%" height="220%"><feGaussianBlur in="SourceGraphic" stdDeviation="2.4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>');
+      out.push('<rect x="0" y="0" width="1120" height="1120" fill="#0a0715" opacity="0.55"/>');
+      let bgStars = '';
+      for (let i = 0; i < 130; i++) { bgStars += `<circle cx="${(Math.random() * 1120).toFixed(0)}" cy="${(Math.random() * 1120).toFixed(0)}" r="${(Math.random() * 1 + 0.3).toFixed(2)}" fill="#fff4c4" opacity="${(Math.random() * 0.5 + 0.15).toFixed(2)}"/>`; }
+      out.push(`<g>${bgStars}</g>`);
+
+      // sectores de casas (desde cúspides; para whole sign coinciden con los signos)
+      if (cusps) {
         for (let i = 0; i < 12; i++) {
-          const start = base - i * 30 * Math.PI / 180, end = base - (i + 1) * 30 * Math.PI / 180;
-          ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, R, start, end, true); ctx.closePath();
-          ctx.fillStyle = i % 2 ? '#120c26' : '#0d0a1a'; ctx.fill();
+          const a1 = toAng(relOf(cusps[i])), a2 = toAng(relOf(cusps[(i + 1) % 12]));
+          out.push(`<path class="sector" data-house="${i}" style="--i:${i}" d="M ${CX} ${CY} L ${PX(R, a1)} ${PY(R, a1)} A ${R} ${R} 0 0 0 ${PX(R, a2)} ${PY(R, a2)} Z" fill="${i % 2 ? 'rgba(18,12,38,.8)' : 'rgba(13,10,26,.66)'}"/>`);
         }
-        ctx.strokeStyle = 'rgba(183,172,214,.25)'; ctx.lineWidth = 1.2;
-        for (let i = 0; i < 12; i++) { const ang = base - i * 30 * Math.PI / 180; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + R * Math.cos(ang), cy + R * Math.sin(ang)); ctx.stroke(); }
+        let spokes = '';
+        for (let i = 0; i < 12; i++) { const a = toAng(relOf(cusps[i])); spokes += `<line x1="${CX}" y1="${CY}" x2="${PX(R, a)}" y2="${PY(R, a)}"/>`; }
+        out.push(`<g stroke="rgba(183,172,214,.25)" stroke-width="1.2">${spokes}</g>`);
       } else {
-        // Sin hora ni sospecha: rueda simple
-        ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fillStyle = '#0d0a1a'; ctx.fill();
+        out.push(`<circle cx="${CX}" cy="${CY}" r="${R}" fill="rgba(13,10,26,.72)"/>`);
       }
 
-      // Bisel interno
-      ctx.beginPath(); ctx.arc(cx, cy, rHouse, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(183,172,214,.18)'; ctx.lineWidth = 1; ctx.stroke();
+      // bisel interno
+      out.push(`<circle cx="${CX}" cy="${CY}" r="${R_HOUSE}" fill="none" stroke="rgba(183,172,214,.18)" stroke-width="1"/>`);
 
-      // Signos en anillo exterior + números de casa (glifos texto)
-      const signGlyph = ['\u2648\uFE0E', '\u2649\uFE0E', '\u264A\uFE0E', '\u264B\uFE0E', '\u264C\uFE0E', '\u264D\uFE0E', '\u264E\uFE0E', '\u264F\uFE0E', '\u2650\uFE0E', '\u2651\uFE0E', '\u2652\uFE0E', '\u2653\uFE0E'];
-      for (let i = 0; i < 12; i++) {
-        const ang = base - (i + 0.5) * 30 * Math.PI / 180; const x = cx + rSigns * Math.cos(ang), y = cy + rSigns * Math.sin(ang) + 4;
-        const signIndex = (data.ascSign + i) % 12; ctx.fillStyle = '#ffe9a6'; ctx.font = SYMBOL_FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(signGlyph[signIndex], x, y);
-        if (!data.noHouses) { const xn = cx + rNums * Math.cos(ang), yn = cy + rNums * Math.sin(ang); ctx.fillStyle = '#d9cef3'; ctx.font = '16px "Spectral SC", Georgia, serif'; ctx.fillText(roman(i + 1), xn, yn); }
+      // borde exterior + ticks de grados (5°/10°/30°)
+      out.push(`<circle cx="${CX}" cy="${CY}" r="${R}" fill="none" stroke="rgba(255,213,74,.30)" stroke-width="1.2"/>`);
+      let ticks = '';
+      for (let d = 0; d < 360; d++) { const a = toAng(relOf(d)); const len = d % 30 === 0 ? 13 : d % 10 === 0 ? 9 : d % 5 === 0 ? 6 : 3; const op = d % 10 === 0 ? '.55' : '.3'; ticks += `<line x1="${PX(R, a)}" y1="${PY(R, a)}" x2="${PX(R - len, a)}" y2="${PY(R - len, a)}" opacity="${op}"/>`; }
+      out.push(`<g stroke="#ffe9a6" stroke-width="0.8">${ticks}</g>`);
+
+      // signos del zodiaco (siempre por posición absoluta) + números de casa (centro de cada arco)
+      for (let k = 0; k < 12; k++) {
+        const a = toAng(relOf(k * 30 + 15));
+        out.push(`<text x="${PX(R_SIGNS, a)}" y="${(CY + R_SIGNS * Math.sin(a) + 4).toFixed(1)}" fill="#ffe9a6" font-size="24" font-weight="600" text-anchor="middle" dominant-baseline="central" font-family="${SYM_FONT}">${SIGN_GLYPHS[k]}</text>`);
+      }
+      if (cusps && !data.noHouses) {
+        for (let i = 0; i < 12; i++) {
+          const span = norm(cusps[(i + 1) % 12] - cusps[i]);
+          const a = toAng(relOf(norm(cusps[i] + span / 2)));
+          out.push(`<text x="${PX(R_NUMS, a)}" y="${PY(R_NUMS, a)}" fill="#d9cef3" font-size="16" text-anchor="middle" dominant-baseline="central" font-family="'Spectral SC',Georgia,serif">${roman(i + 1)}</text>`);
+        }
       }
 
-      // Ángulos reales (solo si hay hora)
+      // ángulos reales (solo si hay hora)
       if (!data.unknownTime) {
-        const axis = (label, lon) => { const rel = norm(lon - data.house0); const ang = toAngRel(rel); ctx.strokeStyle = '#ffd54a'; ctx.lineWidth = 1.8; ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + R * Math.cos(ang), cy + R * Math.sin(ang)); ctx.stroke(); ctx.save(); ctx.translate(cx + (R + 16) * Math.cos(ang), cy + (R + 16) * Math.sin(ang)); ctx.rotate(ang + Math.PI / 2); ctx.fillStyle = '#ffd54a'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center'; ctx.fillText(label, 0, 0); ctx.restore(); };
+        const axis = (label, lon) => {
+          const a = toAng(relOf(lon));
+          out.push(`<line class="angle" x1="${CX}" y1="${CY}" x2="${PX(R, a)}" y2="${PY(R, a)}" stroke="#ffd54a" stroke-width="1.8" filter="url(#glowGold)"/>`);
+          const lx = +(CX + (R + 16) * Math.cos(a)).toFixed(1), ly = +(CY + (R + 16) * Math.sin(a)).toFixed(1);
+          const rot = ((a + Math.PI / 2) * 180 / Math.PI).toFixed(1);
+          out.push(`<text class="angle" x="${lx}" y="${ly}" transform="rotate(${rot} ${lx} ${ly})" fill="#ffd54a" font-size="12" font-weight="bold" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif">${label}</text>`);
+        };
         axis('mc', data.mc); axis('dc', norm(data.ascDeg + 180)); axis('ic', norm(data.mc + 180));
       }
 
-      // nodos: planetas + asc (como cápsula)
-      const nodes = [];
-      for (const p of data.planets) { const rel = norm(p.lon - data.house0); const ang = toAngRel(rel); const x = cx + rPlan * Math.cos(ang), y = cy + rPlan * Math.sin(ang); nodes.push({ label: p.name, glyph: p.glyph, lon: p.lon, x, y, sign: p.sign, dig: p.dig, isAsc: false }); }
-      let ascNode = null; const canHaveAscNode = (!data.unknownTime) || (data.suspectAscSign != null);
-      if (canHaveAscNode) { const ascSign = (!data.unknownTime) ? Math.floor(data.ascDeg / 30) : data.suspectAscSign; const ascRelDeg = (!data.unknownTime) ? norm(data.ascDeg - data.house0) : 0; const a = toAngRel(ascRelDeg); const ax = cx + rPlan * Math.cos(a), ay = cy + rPlan * Math.sin(a); ascNode = { label: 'asc', glyph: 'asc', lon: ascSign * 30, x: ax, y: ay, sign: ascSign, isAsc: true }; }
+      // nodos (planetas + objetos + asc) con anti-colisión radial
+      const nodes = data.planets.map(p => ({ key: p.key, name: p.name, glyph: p.glyph, lon: p.lon, sign: p.sign, dig: p.dig, isObject: !!p.isObject, approx: !!p.approx, retro: !!p.retro, rel: relOf(p.lon), kind: p.isObject ? 'object' : 'planet' }));
+      const canAsc = (!data.unknownTime) || (data.suspectAscSign != null);
+      if (canAsc) {
+        const ascSign = (!data.unknownTime) ? Math.floor(data.ascDeg / 30) : data.suspectAscSign;
+        const ascLon = (!data.unknownTime) ? data.ascDeg : ascSign * 30;
+        nodes.push({ key: 'asc', name: 'ascendente', glyph: 'asc', lon: ascLon, sign: ascSign, rel: relOf(ascLon), kind: 'asc' });
+      }
+      const sorted = [...nodes].sort((a, b) => a.rel - b.rel);
+      const TH = 8; const clusters = []; let cur = [];
+      for (const n of sorted) { if (cur.length && n.rel - cur[cur.length - 1].rel > TH) { clusters.push(cur); cur = []; } cur.push(n); }
+      if (cur.length) clusters.push(cur);
+      if (clusters.length > 1) { const first = clusters[0], last = clusters[clusters.length - 1]; if (first[0].rel + 360 - last[last.length - 1].rel <= TH) { clusters[0] = last.concat(first); clusters.pop(); } }
+      for (const cl of clusters) { cl.forEach((n, idx) => { n.r = Math.max(R_PLAN - idx * 38, 170); const a = toAng(n.rel); n.x = CX + n.r * Math.cos(a); n.y = CY + n.r * Math.sin(a); }); }
 
-      // líneas de aspectos (por signos)
-      if (ascNode) { for (const p of nodes) { const asp = aspectBySigns(ascNode.sign, p.sign); if (asp) { const col = getComputedStyle(document.documentElement).getPropertyValue(`--${asp.colorName}`) || '#fff'; ctx.beginPath(); ctx.moveTo(ascNode.x, ascNode.y); ctx.lineTo(p.x, p.y); ctx.strokeStyle = col; ctx.lineWidth = 2.2; ctx.stroke(); } } }
-      for (let i = 0; i < nodes.length; i++) { for (let j = i + 1; j < nodes.length; j++) { const a = nodes[i], b = nodes[j]; const asp = aspectBySigns(a.sign, b.sign); if (asp) { const col = getComputedStyle(document.documentElement).getPropertyValue(`--${asp.colorName}`) || '#fff'; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.strokeStyle = col; ctx.lineWidth = 1.6; ctx.stroke(); } } }
+      // tránsitos: anillo exterior con su propia anti-colisión (dos radios alternos)
+      const trNodes = (data.transits || []).map(p => ({ ...p, rel: relOf(p.lon) })).sort((a, b) => a.rel - b.rel);
+      if (trNodes.length) {
+        const THT = 7, tcl = []; let tc = [];
+        for (const n of trNodes) { if (tc.length && n.rel - tc[tc.length - 1].rel > THT) { tcl.push(tc); tc = []; } tc.push(n); }
+        if (tc.length) tcl.push(tc);
+        if (tcl.length > 1) { const f = tcl[0], l = tcl[tcl.length - 1]; if (f[0].rel + 360 - l[l.length - 1].rel <= THT) { tcl[0] = l.concat(f); tcl.pop(); } }
+        const TR_R = [522, 547];
+        for (const cl of tcl) { cl.forEach((n, idx) => { n.r = TR_R[idx % 2]; const a = toAng(n.rel); n.x = CX + n.r * Math.cos(a); n.y = CY + n.r * Math.sin(a); }); }
+      }
+
+      // líneas de aspectos (por signos o por grado)
+      const isTr = n => n.key && String(n.key).startsWith('tr_');
+      const lbl = n => n.kind === 'asc' ? 'asc' : `${n.glyph} ${n.name}${isTr(n) ? ' (tránsito)' : ''}`;
+      const aspOf = (A, B) => data.aspectMode === 'degree' ? aspectByDegree(A.lon, B.lon, data.orbMax) : aspectBySigns(A.sign, B.sign);
+      const pts = nodes.filter(n => n.kind !== 'asc');
+      const ascNode = nodes.find(n => n.kind === 'asc');
+      const asps = [];
+      if (ascNode) { for (const p of pts) { const asp = aspOf(ascNode, p); if (asp) asps.push({ a: ascNode, b: p, asp, w: 2.2 }); } }
+      for (let i = 0; i < pts.length; i++) { for (let j = i + 1; j < pts.length; j++) { const asp = aspOf(pts[i], pts[j]); if (asp) asps.push({ a: pts[i], b: pts[j], asp, w: 1.6 }); } }
+      // aspectos tránsito→natal (siempre por grado, orbe fijo)
+      const trTargets = ascNode ? pts.concat([ascNode]) : pts;
+      for (const tn of trNodes) { for (const n of trTargets) { const asp = aspectByDegree(tn.lon, n.lon, TRANSIT_ORB); if (asp) asps.push({ a: tn, b: n, asp, w: 1.3, tr: true }); } }
+      asps.forEach((L, i) => {
+        const col = cssColor(L.asp.colorName);
+        const orbTxt = (L.asp.orb != null) ? ` · orbe ${L.asp.orb.toFixed(1)}°` : '';
+        const coords = `x1="${L.a.x.toFixed(1)}" y1="${L.a.y.toFixed(1)}" x2="${L.b.x.toFixed(1)}" y2="${L.b.y.toFixed(1)}"`;
+        const line = L.tr
+          ? `<line ${coords} stroke="${col}" stroke-width="${L.w}" stroke-dasharray="5 6" opacity=".8"/>`
+          : `<line class="aspline" ${coords} stroke="${col}" stroke-width="${L.w}" pathLength="1"/>`;
+        out.push(`<g class="${L.tr ? 'asp tr' : 'asp'}" data-k="${L.a.key}|${L.b.key}" data-type="${L.asp.type}" data-names="${lbl(L.a)} ↔ ${lbl(L.b)}${orbTxt}" style="--i:${i}">${line}<line class="asphit" ${coords} stroke="rgba(0,0,0,0)" stroke-width="16" pointer-events="stroke"/></g>`);
+      });
 
       // dibujar nodos
-      for (const n of nodes) { ctx.beginPath(); ctx.arc(n.x, n.y, 11, 0, Math.PI * 2); ctx.fillStyle = '#1a1330'; ctx.fill(); ctx.strokeStyle = 'rgba(255,233,166,.6)'; ctx.lineWidth = 1.6; ctx.stroke(); ctx.fillStyle = '#fff3c2'; ctx.font = PLANET_FONT; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(n.glyph, n.x, n.y); }
-      if (ascNode) { ctx.beginPath(); const w = 36, h = 18; ctx.roundRect(ascNode.x - w / 2, ascNode.y - h / 2, w, h, 8); ctx.fillStyle = 'rgba(255,213,74,.12)'; ctx.fill(); ctx.strokeStyle = '#ffd54a'; ctx.lineWidth = 1.6; ctx.stroke(); ctx.fillStyle = '#ffd54a'; ctx.font = 'bold 11px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText('asc', ascNode.x, ascNode.y); }
+      nodes.forEach((n, i) => {
+        if (n.kind === 'asc') {
+          out.push(`<g class="node" data-key="asc" style="--i:${i}"><rect x="${(n.x - 19).toFixed(1)}" y="${(n.y - 10).toFixed(1)}" width="38" height="20" rx="9" fill="rgba(255,213,74,.12)" stroke="#ffd54a" stroke-width="1.6"/><text x="${n.x.toFixed(1)}" y="${(n.y + 1).toFixed(1)}" fill="#ffd54a" font-size="11" font-weight="bold" text-anchor="middle" dominant-baseline="central" font-family="system-ui,sans-serif">asc</text></g>`);
+        } else {
+          const cls = n.isObject ? 'node obj' : 'node';
+          const ring = n.isObject ? 'rgba(183,172,214,.55)' : 'rgba(255,233,166,.6)';
+          const fill = n.isObject ? '#141026' : '#1a1330';
+          const retroMark = n.retro ? `<text x="${(n.x + 13).toFixed(1)}" y="${(n.y - 8).toFixed(1)}" fill="#ff8fa3" font-size="11" font-weight="bold" text-anchor="middle" font-family="system-ui,sans-serif">℞</text>` : '';
+          out.push(`<g class="${cls}" data-key="${n.key}" style="--i:${i}"><circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="12" fill="${fill}" stroke="${ring}" stroke-width="1.6"/><text x="${n.x.toFixed(1)}" y="${(n.y + 1).toFixed(1)}" fill="#fff3c2" font-size="20" font-weight="600" text-anchor="middle" dominant-baseline="central" font-family="${SYM_FONT}">${n.glyph}</text>${retroMark}</g>`);
+        }
+      });
+
+      // nodos de tránsito (anillo exterior)
+      trNodes.forEach((n, i) => {
+        const retroMark = n.retro ? `<text x="${(n.x + 12).toFixed(1)}" y="${(n.y - 8).toFixed(1)}" fill="#ff8fa3" font-size="10" font-weight="bold" text-anchor="middle" font-family="system-ui,sans-serif">℞</text>` : '';
+        out.push(`<g class="node tr" data-key="${n.key}" style="--i:${nodes.length + i}"><circle cx="${n.x.toFixed(1)}" cy="${n.y.toFixed(1)}" r="11" fill="#0e1a17" stroke="rgba(124,255,182,.55)" stroke-width="1.4"/><text x="${n.x.toFixed(1)}" y="${(n.y + 1).toFixed(1)}" fill="#c9f5dd" font-size="17" font-weight="600" text-anchor="middle" dominant-baseline="central" font-family="${SYM_FONT}">${n.glyph}</text>${retroMark}</g>`);
+      });
 
       // anillo interior
-      ctx.beginPath(); ctx.arc(cx, cy, 220, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(183,172,214,.18)'; ctx.lineWidth = 1; ctx.stroke();
+      out.push(`<circle cx="${CX}" cy="${CY}" r="220" fill="none" stroke="rgba(183,172,214,.18)" stroke-width="1"/>`);
+
+      svg.innerHTML = out.join('');
+
+      // info para tooltips
+      const houseOfLon = lon => { if (!cusps) return null; for (let h = 0; h < 12; h++) { const span = norm(cusps[(h + 1) % 12] - cusps[h]); if (norm(lon - cusps[h]) < span) return h + 1; } return null; };
+      for (const n of nodes) {
+        if (n.kind === 'asc') {
+          const where = (!data.unknownTime) ? formatZodiac(data.ascDeg) : `sospechado: ${SIGN_NAMES[n.sign]}`;
+          CHART_UI.nodeInfo.asc = `<b>ascendente</b><br>${where}<br><span class="muted">abre la casa i</span>`;
+        } else {
+          const hs = houseOfLon(n.lon); const houseTxt = hs ? `<br><span class="muted">casa ${roman(hs)}</span>` : '';
+          const nm = n.approx ? `${n.name} ≈` : n.name;
+          const digTxt = n.isObject ? '' : `<br>${DIG_TEXT[n.dig]}`;
+          const retroTxt = n.retro ? ' <span style="color:#ff8fa3">℞</span>' : '';
+          CHART_UI.nodeInfo[n.key] = `<b>${n.glyph} ${nm}${retroTxt}</b><br>${formatZodiac(n.lon)}${digTxt}${houseTxt}`;
+        }
+      }
+      for (const n of trNodes) {
+        const hs = houseOfLon(n.lon); const houseTxt = hs ? `<br><span class="muted">casa ${roman(hs)} natal</span>` : '';
+        const retroTxt = n.retro ? ' <span style="color:#ff8fa3">℞</span>' : '';
+        CHART_UI.nodeInfo[n.key] = `<b>${n.glyph} ${n.name}${retroTxt} — tránsito</b><br>${formatZodiac(n.lon)}${houseTxt}`;
+      }
+      if (cusps && !data.noHouses) {
+        const houses = assignHousesByCusps(data.planets, cusps);
+        for (let i = 0; i < 12; i++) {
+          const h = houses[i];
+          const pl = h.planets.length ? h.planets.map(p => `${p.glyph} ${p.name}`).join(' · ') : '—';
+          const cuspTxt = (data.houseSystem === 'whole') ? SIGN_NAMES[Math.floor(h.cuspLon / 30)] : formatZodiac(h.cuspLon);
+          CHART_UI.houseInfo[i] = `<b>casa ${roman(i + 1)} — ${cuspTxt}</b><br>${HOUSE_MEANINGS[i]}<br><span class="muted">planetas: ${pl}</span>`;
+        }
+      }
+
+      // chips de capas
+      const chips = $('#layerChips'); chips.innerHTML = '';
+      const addChip = (layer, label) => { const c = document.createElement('button'); c.className = 'chip on'; c.dataset.layer = layer; c.textContent = label; chips.appendChild(c); };
+      if (asps.length) addChip('asp', 'aspectos');
+      if (nodes.some(n => n.kind === 'object')) addChip('obj', 'objetos');
+      if (trNodes.length) addChip('tr', 'tránsitos');
+      if (!data.unknownTime) addChip('ang', 'ángulos');
+      svg.classList.remove('hide-asp', 'hide-obj', 'hide-ang', 'hide-tr');
     }
+
+    // interacción de la rueda: tooltips + foco de aspectos
+    (function initChartInteraction() {
+      const svg = $('#chartSvg'), tip = $('#tip'), box = $('#chartBox');
+      const hideTip = () => { tip.hidden = true; };
+      function showTip(html, e) {
+        tip.innerHTML = html; tip.hidden = false;
+        const r = box.getBoundingClientRect();
+        let x = e.clientX - r.left + 14, y = e.clientY - r.top + 14;
+        if (x + tip.offsetWidth > r.width - 6) x = Math.max(6, e.clientX - r.left - tip.offsetWidth - 14);
+        if (y + tip.offsetHeight > r.height - 6) y = Math.max(6, e.clientY - r.top - tip.offsetHeight - 14);
+        tip.style.left = x + 'px'; tip.style.top = y + 'px';
+      }
+      const clearFocus = () => { svg.classList.remove('focus'); svg.querySelectorAll('.hot').forEach(el => el.classList.remove('hot')); };
+      function focusNode(key) {
+        clearFocus(); svg.classList.add('focus');
+        const related = new Set([key]);
+        svg.querySelectorAll('.asp').forEach(el => { const [a, b] = el.dataset.k.split('|'); if (a === key || b === key) { el.classList.add('hot'); related.add(a); related.add(b); } });
+        svg.querySelectorAll('.node').forEach(el => { if (related.has(el.dataset.key)) el.classList.add('hot'); });
+      }
+      function focusAsp(el) {
+        clearFocus(); svg.classList.add('focus'); el.classList.add('hot');
+        const [a, b] = el.dataset.k.split('|');
+        svg.querySelectorAll('.node').forEach(n => { if (n.dataset.key === a || n.dataset.key === b) n.classList.add('hot'); });
+      }
+      function onMove(e) {
+        const t = e.target; if (!t.closest) return;
+        const nodeEl = t.closest('.node'), aspEl = t.closest('.asp'), secEl = t.closest('.sector');
+        if (nodeEl) { focusNode(nodeEl.dataset.key); showTip(CHART_UI.nodeInfo[nodeEl.dataset.key] || '', e); }
+        else if (aspEl) { focusAsp(aspEl); showTip(`<b>${aspEl.dataset.type}</b><br>${aspEl.dataset.names}`, e); }
+        else if (secEl && CHART_UI.houseInfo.length) { clearFocus(); showTip(CHART_UI.houseInfo[+secEl.dataset.house] || '', e); }
+        else { clearFocus(); hideTip(); }
+      }
+      svg.addEventListener('pointermove', onMove);
+      svg.addEventListener('click', onMove);
+      svg.addEventListener('pointerleave', () => { clearFocus(); hideTip(); });
+    })();
 
     const PLANETS_ALL = [
       { key: 'Sun', glyph: '\u2609', name: 'sol' }, { key: 'Moon', glyph: '\u263D', name: 'luna' }, { key: 'Mercury', glyph: '\u263F', name: 'mercurio' }, { key: 'Venus', glyph: '\u2640', name: 'venus' }, { key: 'Mars', glyph: '\u2642', name: 'marte' }, { key: 'Jupiter', glyph: '\u2643', name: 'júpiter' }, { key: 'Saturn', glyph: '\u2644', name: 'saturno' }, { key: 'Uranus', glyph: '\u2645', name: 'urano' }, { key: 'Neptune', glyph: '\u2646', name: 'neptuno' }, { key: 'Pluto', glyph: '\u2647', name: 'plutón' }];
@@ -622,29 +1287,80 @@
       'lo oculto, retiro, enemigos, aflicciones'
     ];
 
-    function computeAndDraw() {
+    const OBJ_DEFS = {
+      nodes: [{ key: 'NNode', glyph: '☊', name: 'nodo norte' }, { key: 'SNode', glyph: '☋', name: 'nodo sur' }],
+      lilith: { key: 'Lilith', glyph: '⚸', name: 'lilith' },
+      chiron: { key: 'Chiron', glyph: '⚷', name: 'quirón', approx: true },
+      fortune: { key: 'Fortune', glyph: '⊗', name: 'parte de la fortuna' }
+    };
+    const mkObj = (def, lon) => ({ key: def.key, glyph: def.glyph, name: def.name, lon: norm(lon), sign: Math.floor(norm(lon) / 30), isObject: true, dig: null, approx: !!def.approx });
+
+    function readOpts() {
+      return {
+        nodes: $('#objNodes').checked, lilith: $('#objLilith').checked, chiron: $('#objChiron').checked, fortune: $('#objFortune').checked,
+        houseSystem: $('#houseSystem').value, aspectMode: $('#aspectMode').value, orbMax: parseFloat($('#orbMax').value) || 6,
+        retro: $('#tradRetro').checked, sect: $('#tradSect').checked
+      };
+    }
+
+    function computeAndDraw(mode) {
+      const sky = !!(mode && mode.sky === true);
       if (!window.Astronomy) { setStatus('no se ha cargado astronomy engine.', 'error'); return; }
       const name = $('#name').value.trim(); const dateStr = $('#date').value; if (!dateStr) { setStatus('→ falta fecha.'); return; }
-      const lat = parseFloat($('#lat').value), lon = parseFloat($('#lon').value); if (isNaN(lat) || isNaN(lon)) { setStatus('→ faltan coordenadas.'); return; }
+      const lat = parseFloat($('#lat').value), lon = parseFloat($('#lon').value);
+      const skyOnly = sky && (isNaN(lat) || isNaN(lon)); // cielo ahora sin ubicación: sin casas ni asc
+      if ((isNaN(lat) || isNaN(lon)) && !skyOnly) { setStatus('→ faltan coordenadas.'); return; }
       const tz = $('#tzSelect').value; const unknown = $('#chkUnknownTime').checked; const suspectStr = $('#suspectAsc').value; const suspectAscSign = (unknown && suspectStr !== '' ? parseInt(suspectStr, 10) : null);
       const [Y, M, D] = dateStr.split('-').map(Number); let utc;
       if (unknown) { utc = localToUTC(tz, Y, M, D, 12, 0); } else { const timeStr = $('#time').value || '12:00'; const [hh, mm] = timeStr.split(':').map(Number); utc = localToUTC(tz, Y, M, D, hh, mm || 0); }
+      const opts = readOpts();
+      const t = new Astronomy.AstroTime(utc);
 
       const plist = getPlanetList();
       const planets = computePlanets(utc, plist);
+      if (opts.retro) for (const p of planets) p.retro = isRetro(p.key, t);
 
       let ascDeg = null, mc = null, ascSign, house0, noHouses = false;
-      if (unknown) { if (suspectAscSign != null) { ascSign = suspectAscSign; house0 = ascSign * 30; } else { ascSign = 0; house0 = 0; noHouses = true; } }
+      if (skyOnly) { ascSign = 0; house0 = 0; noHouses = true; }
+      else if (unknown) { if (suspectAscSign != null) { ascSign = suspectAscSign; house0 = ascSign * 30; } else { ascSign = 0; house0 = 0; noHouses = true; } }
       else { ascDeg = ascendantLongitude(utc, lat, lon); mc = midheavenLongitude(utc, lon); ascSign = Math.floor(ascDeg / 30); house0 = ascSign * 30; }
 
-      drawChart({ planets, house0, ascSign, ascDeg, mc, unknownTime: unknown, noHouses, suspectAscSign });
+      // secta (sólo con asc real)
+      const sunLon = (planets.find(p => p.key === 'Sun') || {}).lon;
+      const moonLon = (planets.find(p => p.key === 'Moon') || {}).lon;
+      const diurnal = (!unknown && ascDeg != null && sunLon != null) ? isDiurnal(sunLon, ascDeg) : null;
+
+      // objetos adicionales
+      const objs = [];
+      if (opts.nodes) { const nn = meanNodeLon(utc); objs.push(mkObj(OBJ_DEFS.nodes[0], nn)); objs.push(mkObj(OBJ_DEFS.nodes[1], nn + 180)); }
+      if (opts.lilith) objs.push(mkObj(OBJ_DEFS.lilith, meanLilithLon(utc)));
+      if (opts.chiron) objs.push(mkObj(OBJ_DEFS.chiron, chironLon(t)));
+      if (opts.fortune && !unknown && ascDeg != null && sunLon != null && moonLon != null) { const fort = diurnal ? norm(ascDeg + moonLon - sunLon) : norm(ascDeg - moonLon + sunLon); objs.push(mkObj(OBJ_DEFS.fortune, fort)); }
+
+      const points = planets.concat(objs);
+
+      // cúspides por sistema
+      let cusps = null;
+      if (!noHouses) {
+        if (opts.houseSystem === 'equal' && !unknown) cusps = equalCusps(ascDeg);
+        else if (opts.houseSystem === 'placidus' && !unknown) cusps = placidusCusps(utc, lat, lon, ascDeg, mc);
+        else cusps = wholeCusps(ascSign); // whole sign (o fallback si no hay hora exacta)
+      }
+      const effSystem = (noHouses || unknown || opts.houseSystem === 'whole') ? 'whole' : opts.houseSystem;
+
+      lastRender = { planets: points, house0, ascSign, ascDeg, mc, unknownTime: unknown || skyOnly, noHouses, suspectAscSign, cusps, houseSystem: effSystem, aspectMode: opts.aspectMode, orbMax: opts.orbMax };
+      renderChart(lastRender);
 
       // resumen + ángulos
       const summary = $('#summary'); const tzName = tz; const ts = unknown ? '— hora desconocida (asumimos 12:00)' : ($('#time').value || '12:00');
-      const ascText = unknown ? (suspectAscSign != null ? `<b>asc:</b> <i>sospechado</i> ${['aries', 'tauro', 'géminis', 'cáncer', 'leo', 'virgo', 'libra', 'escorpio', 'sagitario', 'capricornio', 'acuario', 'piscis'][suspectAscSign]}` : '<b>asc:</b> <i>desconocido</i>') : `<b>asc:</b> ${formatZodiac(ascDeg)}`;
-      const mcText = unknown ? '<b>mc:</b> <i>desconocido</i>' : `<b>mc:</b> ${formatZodiac(mc)}`;
-      summary.innerHTML = `<div><b>${name || 'carta natal'}</b> — ${dateStr} ${ts} ${tzName} · lat ${lat.toFixed(4)}°, lon ${lon.toFixed(4)}°</div>
-                           <div class="mini">${ascText} · ${mcText}</div>`;
+      const titleTxt = sky ? 'cielo ahora' : (name || 'carta natal');
+      const locTxt = skyOnly ? 'sin ubicación (solo cielo)' : `lat ${lat.toFixed(4)}°, lon ${lon.toFixed(4)}°`;
+      const ascText = skyOnly ? '<b>asc:</b> <i>— (sin ubicación)</i>' : unknown ? (suspectAscSign != null ? `<b>asc:</b> <i>sospechado</i> ${SIGN_NAMES[suspectAscSign]}` : '<b>asc:</b> <i>desconocido</i>') : `<b>asc:</b> ${formatZodiac(ascDeg)}`;
+      const mcText = skyOnly ? '<b>mc:</b> <i>—</i>' : unknown ? '<b>mc:</b> <i>desconocido</i>' : `<b>mc:</b> ${formatZodiac(mc)}`;
+      const sysText = (effSystem !== 'whole') ? ` · casas: ${effSystem}` : '';
+      const sectText = (opts.sect && diurnal != null) ? ` · carta ${diurnal ? 'diurna' : 'nocturna'}` : '';
+      summary.innerHTML = `<div><b>${titleTxt}</b> — ${dateStr} ${ts} ${tzName} · ${locTxt}</div>
+                           <div class="mini">${ascText} · ${mcText}${sysText}${sectText}</div>`;
 
       const angles = $('#anglesInfo'); angles.innerHTML = `
         <div class="mini">
@@ -652,28 +1368,42 @@
           <b>dc</b> es el occidente y los vínculos (casa vii). <b>ic</b> habla del hogar, raíces y cierres.
         </div>`;
 
-      // Planetas (leyenda)
+      // Planetas + objetos (leyenda)
       const ro = $('#readout'); ro.innerHTML = '';
-      for (const p of planets) { const d = document.createElement('div'); const dig = DIG_TEXT[p.dig]; d.innerHTML = `<div><span>${p.glyph} ${p.name}</span> · <span class="muted">${formatZodiac(p.lon)}</span> · <span>${dig}</span></div>`; ro.appendChild(d); }
+      for (const p of planets) { const d = document.createElement('div'); const retro = p.retro ? ' <span style="color:#ff8fa3">℞</span>' : ''; d.innerHTML = `<div><span>${p.glyph} ${p.name}${retro}</span> · <span class="muted">${formatZodiac(p.lon)}</span> · <span>${DIG_TEXT[p.dig]}</span></div>`; ro.appendChild(d); }
+      for (const o of objs) { const d = document.createElement('div'); d.innerHTML = `<div><span>${o.glyph} ${o.name}${o.approx ? ' ≈' : ''}</span> · <span class="muted">${formatZodiac(o.lon)}</span></div>`; ro.appendChild(d); }
 
-      // Aspectos al asc (por signos)
+      const aspOf = (aLon, aSign, bLon, bSign) => opts.aspectMode === 'degree' ? aspectByDegree(aLon, bLon, opts.orbMax) : aspectBySigns(aSign, bSign);
+      const colOf = cn => getComputedStyle(document.documentElement).getPropertyValue(`--${cn}`) || '#fff';
+      const orbStr = a => a.orb != null ? ` <span class="muted">(orbe ${a.orb.toFixed(1)}°)</span>` : '';
+
+      // Aspectos al asc
       const ascBox = $('#ascAspects'); ascBox.innerHTML = '';
-      const canAspectsList = (!unknown) || (suspectAscSign != null);
-      if (canAspectsList) { const ascSignEff = (!unknown) ? Math.floor(ascDeg / 30) : suspectAscSign; for (const p of planets) { const asp = aspectBySigns(ascSignEff, p.sign); if (asp) { const item = document.createElement('div'); item.innerHTML = `<div><span>${p.glyph} ${p.name}</span> — <b>${asp.type}</b></div>`; item.style.color = getComputedStyle(document.documentElement).getPropertyValue(`--${asp.colorName}`) || '#fff'; ascBox.appendChild(item); } } if (!ascBox.children.length) { ascBox.innerHTML = '<div class="mini">no hay aspectos principales al ascendente por signos.</div>'; } } else { ascBox.innerHTML = '<div class="mini">no se calculan aspectos al asc sin hora ni ascendente sospechado.</div>'; }
+      const canAspectsList = (!unknown && ascDeg != null) || (suspectAscSign != null);
+      if (canAspectsList) {
+        const ascSignEff = (!unknown) ? Math.floor(ascDeg / 30) : suspectAscSign;
+        const ascLonEff = (!unknown) ? ascDeg : ascSignEff * 30;
+        for (const p of points) { const asp = aspOf(ascLonEff, ascSignEff, p.lon, p.sign); if (asp) { const item = document.createElement('div'); item.innerHTML = `<div><span>${p.glyph} ${p.name}</span> — <b>${asp.type}</b>${orbStr(asp)}</div>`; item.style.color = colOf(asp.colorName); ascBox.appendChild(item); } }
+        if (!ascBox.children.length) ascBox.innerHTML = '<div class="mini">no hay aspectos principales al ascendente.</div>';
+      } else ascBox.innerHTML = '<div class="mini">no se calculan aspectos al asc sin hora ni ascendente sospechado.</div>';
 
-      // Aspectos planeta↔planeta (por signos)
+      // Aspectos punto↔punto
       const pp = $('#ppAspects'); pp.innerHTML = '';
-      for (let i = 0; i < planets.length; i++) {
-        for (let j = i + 1; j < planets.length; j++) {
-          const A = planets[i], B = planets[j]; const asp = aspectBySigns(A.sign, B.sign); if (asp) { const row = document.createElement('div'); row.innerHTML = `<div>${A.glyph} ${A.name} ↔ ${B.glyph} ${B.name} — <b>${asp.type}</b></div>`; row.style.color = getComputedStyle(document.documentElement).getPropertyValue(`--${asp.colorName}`) || '#fff'; pp.appendChild(row); }
-        }
-      }
-      if (!pp.children.length) { pp.innerHTML = '<div class="mini">no hay aspectos por signos entre los planetas seleccionados.</div>'; }
+      for (let i = 0; i < points.length; i++) { for (let j = i + 1; j < points.length; j++) { const A = points[i], B = points[j]; const asp = aspOf(A.lon, A.sign, B.lon, B.sign); if (asp) { const row = document.createElement('div'); row.innerHTML = `<div>${A.glyph} ${A.name} ↔ ${B.glyph} ${B.name} — <b>${asp.type}</b>${orbStr(asp)}</div>`; row.style.color = colOf(asp.colorName); pp.appendChild(row); } } }
+      if (!pp.children.length) pp.innerHTML = '<div class="mini">no hay aspectos entre los puntos seleccionados.</div>';
 
-      // Casas (una columna con significado helenístico breve)
-      const hs = $('#houses'); hs.innerHTML = ''; const signNames = ['aries', 'tauro', 'géminis', 'cáncer', 'leo', 'virgo', 'libra', 'escorpio', 'sagitario', 'capricornio', 'acuario', 'piscis'];
-      if (!noHouses) { const houses = assignHouses(planets, ascSign); for (let i = 0; i < 12; i++) { const h = houses[i]; const div = document.createElement('div'); const plist = h.planets.length ? h.planets.map(p => `${p.glyph} ${p.name}`).join(' · ') : '<span class="muted">—</span>'; div.innerHTML = `<b class="serif" style="font-size:18px">casa ${roman(i + 1)}</b> — ${signNames[h.sign]} · <span class="muted">${HOUSE_MEANINGS[i]}</span><br/><span class="muted">planetas:</span> ${plist}`; hs.appendChild(div); } }
-      else { hs.innerHTML = '<div class="mini">casas: <i>no disponibles</i> (hora desconocida y sin ascendente sospechado).</div>'; }
+      // Casas
+      const hs = $('#houses'); hs.innerHTML = '';
+      if (!noHouses) {
+        const houses = assignHousesByCusps(points, cusps);
+        for (let i = 0; i < 12; i++) { const h = houses[i]; const div = document.createElement('div'); const plist = h.planets.length ? h.planets.map(pt => `${pt.glyph} ${pt.name}`).join(' · ') : '<span class="muted">—</span>'; const head = (effSystem === 'whole') ? SIGN_NAMES[Math.floor(h.cuspLon / 30)] : formatZodiac(h.cuspLon); div.innerHTML = `<b class="serif" style="font-size:18px">casa ${roman(i + 1)}</b> — ${head} · <span class="muted">${HOUSE_MEANINGS[i]}</span><br/><span class="muted">planetas:</span> ${plist}`; hs.appendChild(div); }
+      } else hs.innerHTML = skyOnly ? '<div class="mini">casas: <i>no disponibles</i> (sin ubicación).</div>' : '<div class="mini">casas: <i>no disponibles</i> (hora desconocida y sin ascendente sospechado).</div>';
+
+      exportMeta = { line1: titleTxt, line2: `${dateStr} ${ts} · ${tzName} · ${locTxt}` };
+      syncURL();
+
+      // si los tránsitos estaban activos, recalcularlos sobre la nueva carta
+      if ($('#chkTr').checked) applyTransits();
 
       document.body.classList.add('presentation');
     }
@@ -689,17 +1419,35 @@
 
     function fillNow() { populateTZ(); const d = new Date(); $('#date').valueAsDate = new Date(d.getFullYear(), d.getMonth(), d.getDate()); $('#time').value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; if (navigator.geolocation) { navigator.geolocation.getCurrentPosition(pos => { $('#lat').value = pos.coords.latitude.toFixed(6); $('#lon').value = pos.coords.longitude.toFixed(6); setStatus('coordenadas obtenidas del dispositivo.'); }, () => { }, { enableHighAccuracy: true, timeout: 4000 }); } }
 
-    function exportPNG() { const canvas = $('#chart'); const a = document.createElement('a'); a.download = 'carta_whole_sign.png'; a.href = canvas.toDataURL('image/png'); a.click(); }
+    function exportPNG() {
+      const svg = $('#chartSvg'); const clone = svg.cloneNode(true);
+      clone.removeAttribute('class');
+      clone.setAttribute('width', '1120'); clone.setAttribute('height', '1120');
+      const xml = new XMLSerializer().serializeToString(clone);
+      const img = new Image();
+      img.onload = () => {
+        const S = 2, HEAD = 120;
+        const c = document.createElement('canvas'); c.width = 1120 * S; c.height = (1120 + HEAD) * S;
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#07050a'; ctx.fillRect(0, 0, c.width, c.height);
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#ffd54a'; ctx.font = `${34 * S}px "Spectral SC", Georgia, serif`;
+        ctx.fillText(exportMeta.line1, c.width / 2, 54 * S);
+        ctx.fillStyle = '#b7acd6'; ctx.font = `${15 * S}px Inter, system-ui, sans-serif`;
+        ctx.fillText(exportMeta.line2, c.width / 2, 88 * S);
+        ctx.drawImage(img, 0, HEAD * S, 1120 * S, 1120 * S);
+        const a = document.createElement('a'); a.download = 'carta_whole_sign.png'; a.href = c.toDataURL('image/png'); a.click();
+      };
+      img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(xml);
+    }
 
-    // UI switches
+    // UI switches (genérico: sincroniza todos los toggles .on/off)
     function updateSwitchUI() {
-      const vis = $('#chkVisible').checked; const unk = $('#chkUnknownTime').checked;
-      const tVisible = $('#tglVisible'); const tUnknown = $('#tglUnknown');
-      const sVis = $('#stateVisible'); const sUnk = $('#stateUnknown');
-      if (tVisible) { tVisible.classList.toggle('on', vis); if (sVis) sVis.textContent = vis ? 'on' : 'off'; }
-      if (tUnknown) { tUnknown.classList.toggle('on', unk); if (sUnk) sUnk.textContent = unk ? 'on' : 'off'; }
+      document.querySelectorAll('.toggle').forEach(t => { const cb = t.querySelector('input[type="checkbox"]'); if (!cb) return; t.classList.toggle('on', cb.checked); const pill = t.querySelector('.pill'); if (pill) pill.textContent = cb.checked ? 'on' : 'off'; });
+      const unk = $('#chkUnknownTime').checked;
       $('#unknownExtras').style.display = unk ? 'block' : 'none';
       const time = $('#time'); if (time) time.disabled = unk;
+      const orbRow = $('#orbRow'); if (orbRow) orbRow.style.display = ($('#aspectMode').value === 'degree') ? 'block' : 'none';
     }
 
     // Autotest (igual + tests de aspectos)
@@ -713,42 +1461,273 @@
       try { const utc = new Date(Date.UTC(2024, 5, 1, 12, 0, 0)); const asc = ascendantLongitude(utc, 41.387, 2.170); const mc = midheavenLongitude(utc, 2.170); addTestLine('asc rango [0,360)', asc >= 0 && asc < 360); addTestLine('mc rango [0,360)', mc >= 0 && mc < 360); } catch (e) { addTestLine('error en asc/mc: ' + e.message, false); }
       const digsOK = dignityOf('Mars', 0) === 'dom' && dignityOf('Sun', 0) === 'ex' && dignityOf('Saturn', 6) === 'ex' && dignityOf('Saturn', 3) === 'det'; addTestLine('dignidades: reglas base', digsOK);
       try { const A = 0; const expect = (s, kind) => (aspectBySigns(A, s) || {}).type === kind; const okSxt = expect(2, 'sextil'); const okSqr = expect(3, 'cuadratura'); const okTri = expect(4, 'trígono'); const okOpp = expect(6, 'oposición'); addTestLine('aspectos por signos (2/3/4/6)', okSxt && okSqr && okTri && okOpp); const sym = (a, b) => { const x = aspectBySigns(a, b), y = aspectBySigns(b, a); return (!x && !y) || (x && y && x.type === y.type); }; addTestLine('aspectos por signos simétricos', sym(0, 4) && sym(0, 6) && sym(1, 3)); } catch (e) { addTestLine('error aspectos por signos: ' + e.message, false); }
+      try { const utc = new Date(Date.UTC(1997, 1, 28, 14, 40, 0)); const nn = meanNodeLon(utc), li = meanLilithLon(utc), ch = chironLon(new Astronomy.AstroTime(utc)); const inRange = v => isFinite(v) && v >= 0 && v < 360; addTestLine('objetos (nodo/lilith/quirón) en [0,360)', inRange(nn) && inRange(li) && inRange(ch)); } catch (e) { addTestLine('error objetos: ' + e.message, false); }
+      try { const okC = (aspectByDegree(0, 3, 6) || {}).type === 'conjunción'; const okT = (aspectByDegree(0, 122, 6) || {}).type === 'trígono'; const okNone = aspectByDegree(0, 45, 6) === null; addTestLine('aspectos por grado (conj/tríg/orbe)', okC && okT && okNone); } catch (e) { addTestLine('error aspectos por grado: ' + e.message, false); }
+      try { const utc = new Date(Date.UTC(1997, 1, 28, 14, 40, 0)); const asc = ascendantLongitude(utc, 36.6, -6.216667), mc = midheavenLongitude(utc, -6.216667); const pc = placidusCusps(utc, 36.6, -6.216667, asc, mc); const angOK = Math.abs(norm(pc[0] - asc)) < 1e-6 && Math.abs(norm(pc[9] - mc)) < 1e-6; const oppOK = Math.abs(Math.abs(norm(pc[0] - pc[6])) - 180) < 1e-6; addTestLine('placidus: c1=asc, c10=mc, oposiciones', angOK && oppOK); } catch (e) { addTestLine('error placidus: ' + e.message, false); }
+    }
+
+    // ===== URL compartible (y serialización del formulario para la biblioteca) =====
+    function collectParams() {
+      const p = new URLSearchParams();
+      const put = (k, v) => { if (v !== '' && v != null) p.set(k, v); };
+      put('n', $('#name').value.trim()); put('d', $('#date').value);
+      const unk = $('#chkUnknownTime').checked;
+      if (!unk) put('t', $('#time').value);
+      put('tz', $('#tzSelect').value); put('lat', $('#lat').value); put('lon', $('#lon').value);
+      if (unk) { p.set('u', '1'); if ($('#suspectAsc').value !== '') p.set('sa', $('#suspectAsc').value); }
+      if (!$('#chkVisible').checked) p.set('all', '1');
+      if ($('#objNodes').checked) p.set('no', '1');
+      if ($('#objLilith').checked) p.set('li', '1');
+      if ($('#objChiron').checked) p.set('ch', '1');
+      if ($('#objFortune').checked) p.set('fo', '1');
+      if ($('#houseSystem').value !== 'whole') p.set('hsy', $('#houseSystem').value);
+      if ($('#aspectMode').value !== 'sign') { p.set('am', $('#aspectMode').value); p.set('orb', $('#orbMax').value); }
+      if ($('#tradRetro').checked) p.set('re', '1');
+      if ($('#tradSect').checked) p.set('se', '1');
+      return p;
+    }
+    function syncURL() { history.replaceState(null, '', location.pathname + '?' + collectParams().toString()); }
+
+    function applyURLParams() {
+      const p = new URLSearchParams(location.search);
+      if (![...p.keys()].length) return false;
+      applyParams(p);
+      return !!(p.get('d') && p.get('lat') && p.get('lon'));
+    }
+
+    function applyParams(p) {
+      if (p.get('n')) $('#name').value = p.get('n');
+      if (p.get('d')) $('#date').value = p.get('d');
+      if (p.get('t')) $('#time').value = p.get('t');
+      if (p.get('tz')) { const sel = $('#tzSelect'); if ([...sel.options].some(o => o.value === p.get('tz'))) sel.value = p.get('tz'); }
+      if (p.get('lat')) $('#lat').value = p.get('lat');
+      if (p.get('lon')) $('#lon').value = p.get('lon');
+      $('#chkUnknownTime').checked = p.get('u') === '1';
+      const sa = p.get('sa'); if (sa != null && sa !== '') $('#suspectAsc').value = sa;
+      $('#chkVisible').checked = p.get('all') !== '1';
+      $('#objNodes').checked = p.get('no') === '1';
+      $('#objLilith').checked = p.get('li') === '1';
+      $('#objChiron').checked = p.get('ch') === '1';
+      $('#objFortune').checked = p.get('fo') === '1';
+      if (p.get('hsy')) $('#houseSystem').value = p.get('hsy');
+      if (p.get('am')) $('#aspectMode').value = p.get('am');
+      if (p.get('orb')) { $('#orbMax').value = p.get('orb'); const ov = $('#orbVal'); if (ov) ov.textContent = p.get('orb'); }
+      $('#tradRetro').checked = p.get('re') === '1';
+      $('#tradSect').checked = p.get('se') === '1';
+      if ([p.get('no'), p.get('li'), p.get('ch'), p.get('fo'), p.get('hsy'), p.get('am'), p.get('re'), p.get('se')].some(Boolean)) { const ap = $('#advPanel'), ab = $('#btnAdv'); if (ap) ap.hidden = false; if (ab) ab.setAttribute('aria-expanded', 'true'); }
+      updateSwitchUI();
+    }
+
+    // ===== Tránsitos (biwheel) =====
+    const TRANSIT_ORB = 3;
+    let lastRender = null;
+
+    function setTransitNow() { const d = new Date(); $('#trDate').valueAsDate = new Date(d.getFullYear(), d.getMonth(), d.getDate()); $('#trTime').value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+    function computeTransits() {
+      const dStr = $('#trDate').value; if (!dStr) return null;
+      const tm = $('#trTime').value || '12:00';
+      const [Y, M, D] = dStr.split('-').map(Number); const [hh, mm] = tm.split(':').map(Number);
+      const utc = localToUTC($('#tzSelect').value, Y, M, D, hh, mm || 0);
+      const t = new Astronomy.AstroTime(utc);
+      return getPlanetList().map(p => { const lon = eclipticLongitude(p.key, t); return { key: 'tr_' + p.key, name: p.name, glyph: p.glyph, lon, sign: Math.floor(lon / 30), retro: isRetro(p.key, t) }; });
+    }
+    function applyTransits() {
+      if (!lastRender || !window.Astronomy) return;
+      const on = $('#chkTr').checked;
+      $('#trCtrl').style.display = on ? 'block' : 'none';
+      if (!on) { renderChart(lastRender); $('#trAspects').innerHTML = ''; return; }
+      if (!$('#trDate').value) setTransitNow();
+      const tr = computeTransits(); if (!tr) return;
+      renderChart({ ...lastRender, transits: tr });
+      renderTransitAspects(tr);
+    }
+    function renderTransitAspects(tr) {
+      const box = $('#trAspects'); box.innerHTML = '';
+      const colOf = cn => getComputedStyle(document.documentElement).getPropertyValue(`--${cn}`) || '#fff';
+      const targets = [...lastRender.planets];
+      if (!lastRender.unknownTime && lastRender.ascDeg != null) targets.push({ glyph: '', name: 'ascendente', lon: lastRender.ascDeg });
+      for (const tp of tr) {
+        for (const n of targets) {
+          const asp = aspectByDegree(tp.lon, n.lon, TRANSIT_ORB);
+          if (asp) { const row = document.createElement('div'); row.innerHTML = `<div>${tp.glyph} ${tp.name} <span class="muted">(tránsito)</span> → ${n.glyph} ${n.name} — <b>${asp.type}</b> <span class="muted">(orbe ${asp.orb.toFixed(1)}°)</span></div>`; row.style.color = colOf(asp.colorName); box.appendChild(row); }
+        }
+      }
+      if (!box.children.length) box.innerHTML = '<div class="mini">sin aspectos dentro del orbe de 3° en ese momento.</div>';
+    }
+
+    // ===== Cielo ahora =====
+    function skyNow() {
+      populateTZ();
+      const d = new Date();
+      $('#date').valueAsDate = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+      $('#time').value = `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+      $('#chkUnknownTime').checked = false; updateSwitchUI();
+      const draw = () => computeAndDraw({ sky: true });
+      if (navigator.geolocation) {
+        // dibuja ya con lo que haya; si llega la geolocalización, redibuja con asc/casas del lugar
+        navigator.geolocation.getCurrentPosition(
+          pos => { $('#lat').value = pos.coords.latitude.toFixed(6); $('#lon').value = pos.coords.longitude.toFixed(6); draw(); },
+          () => { }, { enableHighAccuracy: false, timeout: 3500 });
+      }
+      draw();
+    }
+
+    // ===== Biblioteca de cartas (localStorage) =====
+    const STORE_KEY = 'wshc_people';
+    function loadPeople() { try { const v = JSON.parse(localStorage.getItem(STORE_KEY)); return Array.isArray(v) ? v : []; } catch (e) { return []; } }
+    function savePeople(list) { try { localStorage.setItem(STORE_KEY, JSON.stringify(list)); } catch (e) { setStatus('no se pudo guardar (¿almacenamiento lleno?).', 'error'); } }
+    const escHTML = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    function renderLibrary() {
+      const list = loadPeople(); const ul = $('#libraryList');
+      ul.innerHTML = '';
+      if (!list.length) { ul.innerHTML = '<div class="mini">aún no hay cartas guardadas — rellena el formulario y pulsa «guardar carta».</div>'; return; }
+      for (const rec of list) {
+        const div = document.createElement('div'); div.className = 'libRow';
+        const when = rec.params.u === '1' ? `${rec.params.d || ''} · hora desconocida` : `${rec.params.d || ''} ${rec.params.t || ''}`;
+        div.innerHTML = `<button class="libLoad" data-id="${rec.id}"><b>${escHTML(rec.name)}</b> <span class="muted">— ${escHTML(when)}</span></button><button class="libDel" data-id="${rec.id}" title="borrar carta">×</button>`;
+        ul.appendChild(div);
+      }
+    }
+    function saveCurrent() {
+      let name = $('#name').value.trim();
+      if (!name) { name = (prompt('nombre para guardar la carta:') || '').trim(); if (!name) return false; $('#name').value = name; }
+      if (!$('#date').value) { setStatus('→ falta fecha: no hay carta que guardar.'); return false; }
+      const params = Object.fromEntries(collectParams());
+      const list = loadPeople();
+      const i = list.findIndex(r => (r.name || '').toLowerCase() === name.toLowerCase());
+      const rec = { id: i >= 0 ? list[i].id : Date.now(), name, params, saved: new Date().toISOString() };
+      if (i >= 0) list[i] = rec; else list.push(rec);
+      savePeople(list); renderLibrary(); setStatus(`carta de «${name}» guardada en este navegador.`);
+      return true;
+    }
+    function exportLibrary() {
+      const payload = { app: 'wholeSignHouseChart', version: 1, charts: loadPeople() };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a'); a.download = 'cartas_guardadas.json'; a.href = URL.createObjectURL(blob); a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 500);
+    }
+    function importLibrary(file) {
+      const rd = new FileReader();
+      rd.onload = () => {
+        try {
+          const data = JSON.parse(rd.result);
+          const incoming = Array.isArray(data) ? data : (data && Array.isArray(data.charts) ? data.charts : null);
+          if (!incoming) { setStatus('json no reconocido.', 'error'); return; }
+          const list = loadPeople(); let added = 0, updated = 0;
+          for (const rec of incoming) {
+            if (!rec || !rec.name || !rec.params) continue;
+            const i = list.findIndex(r => (r.name || '').toLowerCase() === String(rec.name).toLowerCase());
+            const clean = { id: i >= 0 ? list[i].id : (rec.id || Date.now() + Math.floor(Math.random() * 1e6)), name: String(rec.name), params: rec.params, saved: rec.saved || new Date().toISOString() };
+            if (i >= 0) { list[i] = clean; updated++; } else { list.push(clean); added++; }
+          }
+          savePeople(list); renderLibrary(); setStatus(`importadas: ${added} nuevas, ${updated} actualizadas.`);
+        } catch (e) { setStatus('no se pudo leer el json.', 'error'); }
+      };
+      rd.readAsText(file);
     }
 
     // Listeners
     $('#btnGeo').addEventListener('click', geocode);
-    $('#btnDraw').addEventListener('click', computeAndDraw);
+    $('#btnDraw').addEventListener('click', () => computeAndDraw());
     $('#btnNow').addEventListener('click', () => { fillNow(); setStatus(''); });
+    $('#btnSkyNow').addEventListener('click', skyNow);
+
+    // Biblioteca
+    $('#btnSave').addEventListener('click', saveCurrent);
+    $('#btnSaveTop').addEventListener('click', () => { if (saveCurrent()) { const b = $('#btnSaveTop'); b.textContent = '¡guardada!'; setTimeout(() => { b.textContent = 'guardar'; }, 1600); } });
+    $('#libraryList').addEventListener('click', e => {
+      const del = e.target.closest('.libDel'), load = e.target.closest('.libLoad');
+      const list = loadPeople();
+      if (del) { const rec = list.find(r => String(r.id) === del.dataset.id); if (rec && confirm(`¿borrar la carta de «${rec.name}»?`)) { savePeople(list.filter(r => String(r.id) !== del.dataset.id)); renderLibrary(); } return; }
+      if (load) { const rec = list.find(r => String(r.id) === load.dataset.id); if (!rec) return; applyParams(new URLSearchParams(rec.params)); computeAndDraw(); }
+    });
+    $('#btnExportLib').addEventListener('click', exportLibrary);
+    $('#btnImportLib').addEventListener('click', () => $('#fileImport').click());
+    $('#fileImport').addEventListener('change', e => { if (e.target.files[0]) importLibrary(e.target.files[0]); e.target.value = ''; });
+
+    // Tránsitos
+    $('#chkTr').addEventListener('change', applyTransits);
+    $('#trDate').addEventListener('change', () => { if ($('#chkTr').checked) applyTransits(); });
+    $('#trTime').addEventListener('change', () => { if ($('#chkTr').checked) applyTransits(); });
+    $('#btnTrNow').addEventListener('click', () => { setTransitNow(); if ($('#chkTr').checked) applyTransits(); });
     $('#btnTest').addEventListener('click', runTests);
     $('#btnExample').addEventListener('click', () => { $('#name').value = 'ejemplo'; $('#date').value = '1997-02-28'; $('#time').value = '15:40'; $('#lat').value = '36.600000'; $('#lon').value = '-6.216667'; setStatus('ejemplo cargado.'); });
     $('#chkUnknownTime').addEventListener('change', updateSwitchUI);
     $('#chkVisible').addEventListener('change', updateSwitchUI);
 
+    // Modo avanzado: desplegable + controles
+    $('#btnAdv').addEventListener('click', () => { const ap = $('#advPanel'), ab = $('#btnAdv'); const open = ap.hidden; ap.hidden = !open; ab.setAttribute('aria-expanded', String(open)); });
+    document.addEventListener('change', e => { if (e.target.matches && e.target.matches('.toggle input, #aspectMode, #houseSystem')) updateSwitchUI(); });
+    $('#orbMax').addEventListener('input', () => { const ov = $('#orbVal'); if (ov) ov.textContent = $('#orbMax').value; });
+    // Chips de capas (mostrar/ocultar sin volver a editar)
+    $('#layerChips').addEventListener('click', e => { const c = e.target.closest('.chip'); if (!c) return; const on = c.classList.toggle('on'); $('#chartSvg').classList.toggle('hide-' + c.dataset.layer, !on); });
+
     // Toolbar
     $('#btnBack').addEventListener('click', () => { document.body.classList.remove('presentation'); });
     $('#btnExport').addEventListener('click', exportPNG);
+    $('#btnShare').addEventListener('click', async () => { syncURL(); const b = $('#btnShare'); try { await navigator.clipboard.writeText(location.href); b.textContent = '\u00a1enlace copiado!'; setTimeout(() => { b.textContent = 'compartir enlace'; }, 1600); } catch (e) { prompt('copia el enlace:', location.href); } });
 
-    (async function init() { fillNow(); updateSwitchUI(); setStatus('cargando librería astronómica…'); const ok = await loadAstronomy(); setStatus(ok ? 'librería lista.' : 'no se pudo cargar astronomy engine.', (ok ? 'info' : 'error')); })();
+    (async function init() {
+      populateTZ();
+      renderLibrary();
+      const fromURL = applyURLParams();
+      if (!fromURL) fillNow();
+      updateSwitchUI();
+      setStatus('cargando librer\u00eda astron\u00f3mica\u2026');
+      const ok = await loadAstronomy();
+      setStatus(ok ? 'librer\u00eda lista.' : 'no se pudo cargar astronomy engine.', (ok ? 'info' : 'error'));
+      if (ok && fromURL) computeAndDraw();
+    })();
 
     // ===== Fondo de estrellas (tomado y adaptado de tu index) =====
     const sky = document.getElementById('estrellas-canvas');
     const sctx = sky.getContext('2d');
-    function resizeSky() { sky.width = window.innerWidth; sky.height = window.innerHeight; }
-    resizeSky(); window.addEventListener('resize', () => { resizeSky(); stars = makeStars(); consts = makeConstellations(); });
+    const REDUCE_MOTION = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    // el campo de estrellas es más alto que la ventana: el sobrante se desplaza con el scroll
+    // (parallax dibujado dentro del canvas; un transform css sobre un fixed provoca glitches)
+    let FIELD_H = window.innerHeight;
+    function resizeSky() { sky.width = window.innerWidth; sky.height = window.innerHeight; FIELD_H = Math.floor(window.innerHeight * (REDUCE_MOTION ? 1 : 1.35)); }
+    resizeSky(); window.addEventListener('resize', () => { resizeSky(); stars = makeStars(); consts = makeConstellations(); skyParallax(); });
 
-    const STAR_COUNT = Math.floor(window.innerWidth * window.innerHeight / 1500);
     const CONSTELLATIONS = () => Math.floor(Math.random() * 4) + 10;
     const GROUP_SIZES = [4, 5, 6, 7, 8, 9, 10];
 
-    function makeStars() { const arr = []; for (let i = 0; i < STAR_COUNT; i++) { arr.push({ x: Math.random() * sky.width, y: Math.random() * sky.height, r: Math.random() * 0.7 + 0.6, a: Math.random() * 0.7 + 0.3, ph: Math.random() * Math.PI * 2 }); } return arr; }
+    function makeStars() { const arr = []; const count = Math.floor(sky.width * FIELD_H / 1500); for (let i = 0; i < count; i++) { arr.push({ x: Math.random() * sky.width, y: Math.random() * FIELD_H, r: Math.random() * 0.7 + 0.6, a: Math.random() * 0.7 + 0.3, ph: Math.random() * Math.PI * 2 }); } return arr; }
+
+    let skyShift = 0;
+    const mouse = { x: -1e4, y: -1e4 };
+    window.addEventListener('pointermove', e => { mouse.x = e.clientX; mouse.y = e.clientY; }, { passive: true });
+    function skyParallax() { if (REDUCE_MOTION) return; const extra = Math.max(0, FIELD_H - window.innerHeight); const doc = document.documentElement.scrollHeight - window.innerHeight; const f = doc > 0 ? Math.min(window.scrollY / doc, 1) : 0; skyShift = -f * extra; }
+    window.addEventListener('scroll', skyParallax, { passive: true });
     function flicker(e, t) { return e.a * (0.93 + 0.07 * Math.sin(t * 0.37 + e.ph)); }
 
-    function makeConstellations() { const list = []; for (let i = 0; i < CONSTELLATIONS(); i++) { const num = GROUP_SIZES[Math.floor(Math.random() * GROUP_SIZES.length)]; const cx = Math.random() * (sky.width * 0.8) + sky.width * 0.1; const cy = Math.random() * (sky.height * 0.8) + sky.height * 0.1; const rg = Math.min(sky.width, sky.height) * (0.10 + Math.random() * 0.08); const used = new Set(); const nodes = []; let attempts = 0; while (nodes.length < num && attempts < 200) { const ang = Math.random() * 2 * Math.PI; const rr = Math.random() * rg * 0.85; const x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr; let best = null, bd = 1e9; for (let j = 0; j < stars.length; j++) { if (used.has(j)) continue; const e = stars[j]; const d = Math.hypot(e.x - x, e.y - y); if (d < bd) { bd = d; best = j; } } if (best !== null) { used.add(best); nodes.push(best); } attempts++; } const edges = []; if (nodes.length > 1) { let connected = [0]; let rest = Array.from({ length: nodes.length }, (_, i) => i).slice(1); while (rest.length) { let bd = 1e9, fi = null, ti = null; for (const i of connected) { for (const j of rest) { const A = stars[nodes[i]], B = stars[nodes[j]]; const d = Math.hypot(A.x - B.x, A.y - B.y); if (d < bd) { bd = d; fi = i; ti = j; } } } edges.push([fi, ti]); connected.push(ti); rest = rest.filter(x => x !== ti); } } if (nodes.length > 4 && Math.random() > 0.5) { const a = Math.floor(Math.random() * nodes.length); const b = (a + 2 + Math.floor(Math.random() * (nodes.length - 3))) % nodes.length; if (!edges.some(([x, y]) => (x === a && y === b) || (x === b && y === a))) { edges.push([a, b]); } } list.push({ nodes, edges }); } return list; }
+    function makeConstellations() { const list = []; for (let i = 0; i < CONSTELLATIONS(); i++) { const num = GROUP_SIZES[Math.floor(Math.random() * GROUP_SIZES.length)]; const cx = Math.random() * (sky.width * 0.8) + sky.width * 0.1; const cy = Math.random() * (FIELD_H * 0.8) + FIELD_H * 0.1; const rg = Math.min(sky.width, FIELD_H) * (0.10 + Math.random() * 0.08); const used = new Set(); const nodes = []; let attempts = 0; while (nodes.length < num && attempts < 200) { const ang = Math.random() * 2 * Math.PI; const rr = Math.random() * rg * 0.85; const x = cx + Math.cos(ang) * rr, y = cy + Math.sin(ang) * rr; let best = null, bd = 1e9; for (let j = 0; j < stars.length; j++) { if (used.has(j)) continue; const e = stars[j]; const d = Math.hypot(e.x - x, e.y - y); if (d < bd) { bd = d; best = j; } } if (best !== null) { used.add(best); nodes.push(best); } attempts++; } const edges = []; if (nodes.length > 1) { let connected = [0]; let rest = Array.from({ length: nodes.length }, (_, i) => i).slice(1); while (rest.length) { let bd = 1e9, fi = null, ti = null; for (const i of connected) { for (const j of rest) { const A = stars[nodes[i]], B = stars[nodes[j]]; const d = Math.hypot(A.x - B.x, A.y - B.y); if (d < bd) { bd = d; fi = i; ti = j; } } } edges.push([fi, ti]); connected.push(ti); rest = rest.filter(x => x !== ti); } } if (nodes.length > 4 && Math.random() > 0.5) { const a = Math.floor(Math.random() * nodes.length); const b = (a + 2 + Math.floor(Math.random() * (nodes.length - 3))) % nodes.length; if (!edges.some(([x, y]) => (x === a && y === b) || (x === b && y === a))) { edges.push([a, b]); } } let sx = 0, sy = 0; for (const i of nodes) { sx += stars[i].x; sy += stars[i].y; } list.push({ nodes, edges, cx: sx / (nodes.length || 1), cy: sy / (nodes.length || 1) }); } return list; }
 
     let stars = makeStars();
     let consts = makeConstellations();
 
-    function paintSky(t) { sctx.clearRect(0, 0, sky.width, sky.height); for (const e of stars) { sctx.save(); sctx.beginPath(); sctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); sctx.globalAlpha = flicker(e, t / 1000); sctx.fillStyle = '#fff'; sctx.shadowColor = '#fff'; sctx.shadowBlur = 6 + e.a * 14; sctx.fill(); sctx.restore(); } for (const c of consts) { sctx.save(); sctx.strokeStyle = 'rgba(255,255,255,0.44)'; sctx.lineWidth = 1.2; sctx.setLineDash([1, 5]); sctx.beginPath(); for (const [i1, i2] of c.edges) { const A = stars[c.nodes[i1]], B = stars[c.nodes[i2]]; sctx.moveTo(A.x, A.y); sctx.lineTo(B.x, B.y); } sctx.stroke(); sctx.setLineDash([]); sctx.restore(); } requestAnimationFrame(paintSky); }
+    const meteors = [];
+    function paintSky(t) {
+      sctx.setTransform(1, 0, 0, 1, 0, 0);
+      sctx.clearRect(0, 0, sky.width, sky.height);
+      sctx.translate(0, skyShift); // parallax: el campo se desliza dentro del lienzo
+      for (const e of stars) { sctx.save(); sctx.beginPath(); sctx.arc(e.x, e.y, e.r, 0, Math.PI * 2); sctx.globalAlpha = flicker(e, t / 1000); sctx.fillStyle = '#fff'; sctx.shadowColor = '#fff'; sctx.shadowBlur = 6 + e.a * 14; sctx.fill(); sctx.restore(); }
+      // constelaciones: se iluminan cerca del cursor
+      const my = mouse.y - skyShift;
+      for (const c of consts) {
+        const glow = Math.max(0, 1 - Math.hypot(c.cx - mouse.x, c.cy - my) / 300);
+        sctx.save(); sctx.strokeStyle = `rgba(255,255,255,${(0.30 + 0.42 * glow).toFixed(3)})`; sctx.lineWidth = 1.2; sctx.setLineDash([1, 5]); sctx.beginPath();
+        for (const [i1, i2] of c.edges) { const A = stars[c.nodes[i1]], B = stars[c.nodes[i2]]; sctx.moveTo(A.x, A.y); sctx.lineTo(B.x, B.y); }
+        sctx.stroke(); sctx.setLineDash([]); sctx.restore();
+      }
+      // estrellas fugaces ocasionales
+      if (!REDUCE_MOTION) {
+        if (Math.random() < 0.0012 && meteors.length < 2) { const dir = Math.random() < 0.5 ? 1 : -1; meteors.push({ x: Math.random() * sky.width, y: Math.random() * FIELD_H * 0.5, vx: dir * (6 + Math.random() * 5), vy: 3 + Math.random() * 3, life: 0 }); }
+        for (const m of meteors) { m.x += m.vx; m.y += m.vy; m.life += 0.022; const a = Math.sin(Math.PI * Math.min(m.life, 1)) * 0.85; sctx.save(); sctx.strokeStyle = `rgba(255,244,196,${a.toFixed(3)})`; sctx.lineWidth = 1.6; sctx.beginPath(); sctx.moveTo(m.x - m.vx * 9, m.y - m.vy * 9); sctx.lineTo(m.x, m.y); sctx.stroke(); sctx.restore(); }
+        for (let i = meteors.length - 1; i >= 0; i--) { const m = meteors[i]; if (m.life >= 1 || m.x < -80 || m.x > sky.width + 80 || m.y > FIELD_H + 80) meteors.splice(i, 1); }
+      }
+      requestAnimationFrame(paintSky);
+    }
     requestAnimationFrame(paintSky);
   </script>
 </body>
