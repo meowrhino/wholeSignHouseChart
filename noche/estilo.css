@@ -649,3 +649,99 @@ select option {
 :root {
   --firma: var(--gris)
 }
+
+/* ===== la lectura y hoy sobre tu carta ===== */
+#lee {
+  max-width: 64ch;
+  margin: 0 auto;
+  padding: 40px max(16px, env(safe-area-inset-right)) 24px max(16px, env(safe-area-inset-left));
+  font: 15px/1.6 Georgia, serif
+}
+
+#lee h2 {
+  font: 600 13px/1.3 var(--display);
+  margin: 0 0 6px
+}
+
+#hoy {
+  margin-bottom: 40px
+}
+
+#lectura .item,
+#hoy .item {
+  padding: 12px 0;
+  border-bottom: 1px solid #1f1f1f
+}
+
+#lectura h3,
+#hoy h3 {
+  font: 600 13px/1.3 var(--display);
+  margin: 0 0 4px;
+  color: var(--tinta)
+}
+
+#lectura h3.sub {
+  margin-top: 32px;
+  color: var(--gris)
+}
+
+#lectura p,
+#hoy p {
+  margin: 0
+}
+
+#lectura .que {
+  color: var(--gris);
+  font-size: 13px;
+  font-style: italic
+}
+
+#lee .mini {
+  font: 12px/1.5 var(--letra);
+  margin-top: 8px
+}
+
+.modos {
+  font: 13px/1.3 var(--display);
+  color: var(--gris);
+  margin-bottom: 4px !important
+}
+
+.modos button[aria-pressed="true"] {
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 3px
+}
+
+#hoy .acciones {
+  margin-top: 12px;
+  font-family: var(--display)
+}
+
+.marcado {
+  background: #141414;
+  transition: background .3s
+}
+
+/* las tablas, plegadas */
+#plegadas > summary {
+  cursor: pointer;
+  list-style: none;
+  max-width: 64ch;
+  margin: 0 auto;
+  padding: 16px max(16px, env(safe-area-inset-right)) 16px max(16px, env(safe-area-inset-left));
+  font: 600 12px/1.3 var(--display);
+  color: var(--gris)
+}
+
+#plegadas > summary::-webkit-details-marker {
+  display: none
+}
+
+#plegadas > summary::after {
+  content: ' +'
+}
+
+#plegadas[open] > summary::after {
+  content: ' −'
+}

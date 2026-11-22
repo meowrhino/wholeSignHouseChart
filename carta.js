@@ -420,7 +420,7 @@ function computeAndDraw(mode) {
   }
   const effSystem = (noHouses || unknown || opts.houseSystem === 'whole') ? 'whole' : opts.houseSystem;
 
-  lastRender = { planets: points, house0, ascSign, ascDeg, mc, unknownTime: unknown || skyOnly, noHouses, suspectAscSign, cusps, houseSystem: effSystem, aspectMode: opts.aspectMode, orbMax: opts.orbMax };
+  lastRender = { sky, planets: points, house0, ascSign, ascDeg, mc, unknownTime: unknown || skyOnly, noHouses, suspectAscSign, cusps, houseSystem: effSystem, aspectMode: opts.aspectMode, orbMax: opts.orbMax };
   renderChart(lastRender);
 
   // resumen + ángulos
@@ -478,6 +478,7 @@ function computeAndDraw(mode) {
   if ($('#chkTr').checked) applyTransits();
 
   document.body.classList.add('presentation');
+  if (window.renderLectura) renderLectura(lastRender); // lectura.js, si la página la carga
 }
 
 // Geocoder OSM
@@ -700,7 +701,9 @@ function importLibrary(file) {
 
 // Listeners
 $('#btnGeo').addEventListener('click', geocode);
-$('#btnDraw').addEventListener('click', () => computeAndDraw());
+// dibujar busca antes el lugar escrito, si ha cambiado desde la última búsqueda
+let qBuscado = '';
+$('#btnDraw').addEventListener('click', async () => { const q = $('#q').value.trim(); if (q && q !== qBuscado) { await geocode(); qBuscado = q; } computeAndDraw(); });
 $('#btnNow').addEventListener('click', () => { fillNow(); setStatus(''); });
 $('#btnSkyNow').addEventListener('click', skyNow);
 

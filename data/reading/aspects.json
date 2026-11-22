@@ -1,0 +1,336 @@
+{
+  "traditional": {
+    "sun-moon": {
+      "conj": "las dos luces van juntas: lo que se quiere y lo que se necesita salen del mismo sitio, con fuerza de comienzo y poca distancia para mirarse.",
+      "easy": "las luminarias se miran con buenos ojos: la voluntad y el ánimo se entienden, y lo que se emprende encuentra apoyo en el día a día.",
+      "hard": "las luminarias se contradicen: lo que se busca fuera y lo que pide la casa no coinciden, y hay que repartir el tiempo entre los dos."
+    },
+    "sun-mercury": {
+      "conj": "la palabra se pone al servicio de la voluntad: se piensa para lo que se quiere, con claridad pero con poca distancia de uno mismo.",
+      "easy": "el juicio y el propósito se dan la mano: buen tiempo para explicar, firmar, ordenar papeles y decir lo que se pretende.",
+      "hard": "lo que se dice no acaba de encajar con lo que se quiere; conviene revisar mensajes y planes antes de darlos por buenos."
+    },
+    "sun-venus": {
+      "conj": "la benéfica menor acompaña al sol: trato amable, gusto por lo bello y facilidad para agradar, aunque a veces cueste decir que no.",
+      "easy": "venus suaviza el carácter: la cortesía abre puertas, los afectos acompañan lo que se emprende y el arte encuentra sitio.",
+      "hard": "el deseo de agradar y la propia voluntad tiran en sentidos distintos; se atiende al gusto ajeno y se descuida un poco el propio."
+    },
+    "sun-mars": {
+      "conj": "marte calienta al sol: mucho empuje, decisión rápida y valor, pero también prisa e impaciencia con lo que va lento.",
+      "easy": "el ánimo y la fuerza se ayudan: hay valor para empezar, iniciativa bien dirigida y energía que no se desperdicia.",
+      "hard": "la voluntad se enciende contra lo que la frena; la ira llega pronto y conviene medir la fuerza antes de usarla."
+    },
+    "sun-jupiter": {
+      "conj": "júpiter amplía al sol: confianza, generosidad y gusto por lo grande; la única tarea es la medida, porque todo tiende a crecer.",
+      "easy": "el benéfico mayor protege la voluntad: favor de maestros y mayores, buena fe en los propósitos y ánimo para extenderse.",
+      "hard": "júpiter empuja al sol más allá de su medida: se promete de más, se confía de más, y la tarea es poner límite."
+    },
+    "sun-saturn": {
+      "conj": "saturno enfría al sol: la voluntad se vuelve seria, lenta y constante; lo que se logra cuesta, pero dura.",
+      "easy": "saturno da forma a la voluntad sin apagarla: paciencia, disciplina y respeto ajeno, con frutos que llegan tarde pero firmes.",
+      "hard": "la voluntad encuentra muros y retrasos; la autoridad pesa, y la prueba es seguir con paciencia sin dejarse enfriar del todo."
+    },
+    "moon-mercury": {
+      "conj": "la mente y el ánimo van juntos: se piensa con lo que se siente, con memoria viva, ingenio cambiante y mucha conversación.",
+      "easy": "el juicio acompaña al humor del día: facilidad para hablar de lo íntimo, aprender de lo cotidiano y llevar bien la casa.",
+      "hard": "la cabeza y el corazón se interrumpen: lo que se siente nubla lo que se piensa, y al revés; mejor no decidir en caliente."
+    },
+    "moon-venus": {
+      "conj": "venus endulza a la luna: ánimo afable, gusto por la casa bonita y la compañía, y cierta blandura ante lo que agrada.",
+      "easy": "la benéfica acompaña al ánimo: trato fácil con la familia y los cercanos, calma en casa y gusto por los placeres sencillos.",
+      "hard": "el afecto y la necesidad no coinciden: se busca consuelo en lo que agrada y no siempre en lo que sostiene."
+    },
+    "moon-mars": {
+      "conj": "marte calienta a la luna: ánimo vivo, reacciones rápidas y genio pronto; se siente con fuerza y se defiende lo propio.",
+      "easy": "el valor sostiene al ánimo: hay energía para el día a día, decisión en lo doméstico y coraje cuando hace falta.",
+      "hard": "el ánimo se irrita con facilidad; las prisas y las riñas pequeñas piden una pausa antes de responder."
+    },
+    "moon-jupiter": {
+      "conj": "júpiter ensancha a la luna: ánimo generoso, buena fe y gusto por acoger, aunque cueste moderar el apetito de todo.",
+      "easy": "el benéfico mayor favorece al ánimo: protección en la casa, ayuda del entorno y un fondo de optimismo que sostiene.",
+      "hard": "el ánimo se desborda: se espera mucho, se da mucho, y luego toca recoger; la medida es la lección."
+    },
+    "moon-saturn": {
+      "conj": "saturno enfría a la luna: ánimo serio y reservado, sentido del deber y emociones que se guardan antes que mostrarse.",
+      "easy": "saturno da cauce al ánimo: constancia, prudencia en la casa y lealtad duradera con quien se gana la confianza.",
+      "hard": "el ánimo se siente frenado o solo; lo que se necesita llega con retraso, y la tarea es sostenerse sin endurecerse."
+    },
+    "mercury-venus": {
+      "conj": "venus da gracia a la palabra: hablar con tacto, escribir con gusto y buen oído para el arte y las formas.",
+      "easy": "el ingenio y el gusto se ayudan: buen tiempo para cartas, versos, acuerdos y conversaciones amables.",
+      "hard": "la cortesía y el juicio no casan: se dice lo que agrada en vez de lo que se piensa, o se piensa de más lo que se siente."
+    },
+    "mercury-mars": {
+      "conj": "marte afila a mercurio: mente rápida, palabra cortante y gusto por la discusión; se piensa deprisa y se responde antes.",
+      "easy": "el ingenio gana filo sin herir: decisión al hablar, habilidad con las manos y rapidez para resolver.",
+      "hard": "la palabra se calienta: discusiones, prisas y frases que cortan; conviene contar hasta diez antes de escribir."
+    },
+    "mercury-jupiter": {
+      "conj": "júpiter ensancha a mercurio: mente amplia, gusto por saber y por enseñar, aunque a veces se pierda el detalle.",
+      "easy": "el juicio encuentra buena guía: estudios, consejos y acuerdos salen bien, y la palabra se escucha con respeto.",
+      "hard": "las ideas crecen más que los hechos: se habla de más, se promete de más; toca revisar la letra pequeña."
+    },
+    "mercury-saturn": {
+      "conj": "saturno da peso a mercurio: pensamiento lento, hondo y metódico; se habla poco y se mide cada palabra.",
+      "easy": "la mente gana orden y paciencia: buen tiempo para estudiar, calcular, planificar y terminar lo empezado.",
+      "hard": "el pensamiento se vuelve pesimista o se atasca; los trámites se retrasan y conviene no tomar la duda por verdad."
+    },
+    "venus-mars": {
+      "conj": "los dos que se buscan van juntos: deseo vivo, afectos ardientes y una mezcla de ternura y empuje en todo lo que atrae.",
+      "easy": "venus templa a marte y marte despierta a venus: el deseo y el afecto se ayudan, con calidez y sin brusquedad.",
+      "hard": "el deseo y el afecto riñen: se quiere con prisa o se discute con quien se quiere; la paciencia suaviza el choque."
+    },
+    "venus-jupiter": {
+      "conj": "los dos benéficos juntos: generosidad, buen gusto, alegría y facilidad para ser querido; la única sombra es el exceso.",
+      "easy": "las dos fortunas se ayudan: amistades, afectos y placeres llegan sin forzarlos, y el trato con los demás es fácil.",
+      "hard": "aun en choque, los benéficos no dañan: el riesgo es el exceso, la indulgencia y querer más de lo que hace falta."
+    },
+    "venus-saturn": {
+      "conj": "saturno enfría a venus: afecto serio, fiel y lento en mostrarse; se quiere con cuidado y se valora lo que dura.",
+      "easy": "saturno da forma a venus: amores constantes, gusto sobrio y vínculos que maduran con el tiempo.",
+      "hard": "el afecto encuentra frío o retraso: se teme no ser querido, se espera demasiado; la constancia acaba dando fruto."
+    },
+    "mars-jupiter": {
+      "conj": "júpiter da causa a marte: valor con propósito, empuje generoso y fuerza para grandes empresas, si no se desborda.",
+      "easy": "la fuerza encuentra buena dirección: iniciativa con criterio, valor bien visto y energía que sirve a algo mayor.",
+      "hard": "el empuje se pasa de medida: se arriesga de más o se lucha por causas demasiado grandes; conviene medir antes."
+    },
+    "mars-saturn": {
+      "conj": "los dos maléficos juntos aprietan: frío y calor a la vez, fuerza contenida; se aprende a dirigir la energía con disciplina.",
+      "easy": "saturno disciplina a marte: esfuerzo constante, trabajo duro bien hecho y resistencia para lo que pide tiempo.",
+      "hard": "el impulso y el freno chocan: arranques cortados, frustración y obstáculos; la prueba es avanzar despacio sin rendirse."
+    },
+    "jupiter-saturn": {
+      "conj": "los dos lentos se encuentran: tiempo de cerrar un ciclo y fundar otro, de unir lo que crece con lo que dura.",
+      "easy": "la expansión y la medida se entienden: crecimiento ordenado, buen juicio en las empresas y paciencia premiada.",
+      "hard": "el deseo de crecer y la necesidad de limitarse tiran en contra; avances y frenos se alternan hasta encontrar el ritmo."
+    }
+  },
+  "modern": {
+    "sun-moon": {
+      "conj": "la voluntad y las emociones nacen del mismo punto: es fácil sentir lo que quieres y querer lo que sientes, aunque cuesta verte desde fuera.",
+      "easy": "lo que quieres y lo que necesitas colaboran: hay una sensación de estar en casa dentro de ti que da calma para crecer.",
+      "hard": "lo que quieres y lo que necesitas discuten: una parte mira adelante y otra pide refugio, y escuchar a las dos te hace más entero."
+    },
+    "sun-mercury": {
+      "conj": "tu forma de pensar y tu identidad van juntas: piensas desde ti, con claridad, y cuesta separar una idea de quien eres.",
+      "easy": "la mente sirve al propósito: las palabras salen con facilidad cuando hablas de lo que te importa.",
+      "hard": "lo que piensas y lo que buscas se desajustan; vale la pena revisar si tus ideas te representan o solo te defienden."
+    },
+    "sun-venus": {
+      "conj": "la identidad se expresa a través del gusto y el afecto: quieres que tu vida sea bonita y que se note lo que valoras.",
+      "easy": "el placer y el propósito se apoyan: cuidar lo que te gusta te acerca a lo que eres.",
+      "hard": "el deseo de gustar choca con el de ser tú; el trabajo es valorar tus preferencias sin pedir permiso."
+    },
+    "sun-mars": {
+      "conj": "la identidad y el impulso son lo mismo: actúas para saber quién eres, con energía directa y poca paciencia para esperar.",
+      "easy": "la energía tiene dirección: sabes ir a por lo que quieres sin pelearte con el mundo para conseguirlo.",
+      "hard": "el impulso se adelanta a la voluntad o choca con ella; la frustración avisa de dónde tu fuerza necesita un cauce mejor."
+    },
+    "sun-jupiter": {
+      "conj": "la identidad se expande: confías en ti y en la vida, buscas sentido en lo grande y cuesta conformarse con poco.",
+      "easy": "la confianza acompaña al propósito: crecer parece natural y la generosidad vuelve hacia ti.",
+      "hard": "las expectativas crecen más rápido que el suelo; medir el entusiasmo convierte la promesa en algo real."
+    },
+    "sun-saturn": {
+      "conj": "la identidad se construye con esfuerzo: te tomas en serio, a veces demasiado, y lo que logras echa raíces hondas.",
+      "easy": "la ambición y la paciencia trabajan juntas: sabes construir paso a paso algo que te representa.",
+      "hard": "una voz exigente pone en duda lo que eres; cada límite atravesado con calma se convierte en autoridad propia."
+    },
+    "sun-uranus": {
+      "conj": "la identidad pide libertad: ser distinto es parte de ser tú, y la rutina ajena se queda pequeña enseguida.",
+      "easy": "lo original encuentra sitio en tu propósito: los cambios llegan como aire fresco y no como sacudidas.",
+      "hard": "la necesidad de libertad irrumpe contra lo establecido; los giros repentinos piden que elijas qué quieres cambiar de verdad."
+    },
+    "sun-neptune": {
+      "conj": "los bordes de la identidad se vuelven porosos: sensibilidad, imaginación y empatía, y la tarea de saber dónde acabas tú.",
+      "easy": "la inspiración alimenta el propósito: lo que imaginas te orienta y la compasión forma parte de quién eres.",
+      "hard": "el ideal difumina la voluntad: cuesta ver claro qué quieres y es fácil idealizar; poner los pies en tierra no apaga el sueño."
+    },
+    "sun-pluto": {
+      "conj": "la identidad gana intensidad: vives las cosas a fondo, buscas lo que hay debajo y aceptas transformarte más de una vez.",
+      "easy": "la fuerza interior apoya al propósito: hay capacidad para regenerarse e ir hasta el fondo de lo que importa.",
+      "hard": "el control y la voluntad echan un pulso, con otros o contigo, que al final deja una versión más honesta de ti."
+    },
+    "moon-mercury": {
+      "conj": "pensar y sentir van tan juntos que hablas de lo que sientes casi sin filtro; la memoria emocional es aguda.",
+      "easy": "la mente entiende al corazón: encuentras palabras para lo que sientes, y eso calma.",
+      "hard": "la cabeza y las emociones se interrumpen; nombrar lo que sientes sin juzgarlo tiende un puente entre las dos."
+    },
+    "moon-venus": {
+      "conj": "la necesidad de cuidado y el gusto por lo bello se juntan: calman la armonía, la belleza y el afecto cercano.",
+      "easy": "el afecto sostiene a las emociones: sabes darte placer y consuelo sin culpa.",
+      "hard": "lo que necesitas y lo que deseas no siempre coinciden; distinguir el capricho de la necesidad te hace más libre."
+    },
+    "moon-mars": {
+      "conj": "las emociones llegan con fuerza y rapidez: sientes y reaccionas a la vez, y defiendes con fiereza lo que quieres.",
+      "easy": "la energía protege a las emociones: actúas por lo que sientes y te cuidas con decisión.",
+      "hard": "las emociones se vuelven reacción antes de pensarlas; entender la rabia como un aviso la hace útil."
+    },
+    "moon-jupiter": {
+      "conj": "las emociones se ensanchan: necesitas espacio, sentido y generosidad, y acoges a los demás con facilidad.",
+      "easy": "un optimismo de fondo sostiene: confías en que habrá cuidado, y eso suele hacerlo posible.",
+      "hard": "la necesidad emocional se desborda: das o pides de más; encontrar la medida no te resta calidez."
+    },
+    "moon-saturn": {
+      "conj": "las emociones se guardan con prudencia: tiendes a cuidarte por tu cuenta, y la tarea es dejar que también te cuiden.",
+      "easy": "la estabilidad emocional se construye con constancia: eres de fiar para ti y para los demás.",
+      "hard": "el deber pesa sobre lo que necesitas; reconocer la soledad y la exigencia permite aflojarlas y darte un sitio."
+    },
+    "moon-uranus": {
+      "conj": "las emociones cambian deprisa: necesitas libertad incluso en la intimidad, y la cercanía gusta más sin ataduras.",
+      "easy": "la independencia y la sensibilidad conviven: te adaptas a los cambios con curiosidad y sin perder el centro.",
+      "hard": "la necesidad de seguridad choca con la de libertad; las sacudidas emocionales piden un hogar que tenga ventanas."
+    },
+    "moon-neptune": {
+      "conj": "las emociones no tienen bordes claros: absorbes el ambiente, intuyes mucho y necesitas momentos de retiro.",
+      "easy": "la sensibilidad se vuelve imaginación y compasión: entiendes sin palabras y te inspiran los estados de ánimo.",
+      "hard": "es fácil confundir lo propio con lo ajeno o idealizar el refugio; poner límites suaves protege la sensibilidad."
+    },
+    "moon-pluto": {
+      "conj": "las emociones son hondas e intensas: sientes todo a fondo y buscas vínculos que no se queden en la superficie.",
+      "easy": "la intensidad emocional se vuelve fuerza: sabes atravesar crisis y salir con más recursos.",
+      "hard": "el miedo a perder empuja a controlar; soltar poco a poco transforma la necesidad en confianza."
+    },
+    "mercury-venus": {
+      "conj": "la mente busca belleza: hablas con gracia, piensas con gusto y cuidas las formas de lo que se dice.",
+      "easy": "las ideas y los afectos colaboran: es fácil reconciliar, explicar con tacto y crear con palabras.",
+      "hard": "la necesidad de agradar matiza lo que piensas; decir lo que crees, y decirlo con cariño, es posible a la vez."
+    },
+    "mercury-mars": {
+      "conj": "la mente es rápida y combativa: piensas deprisa, dices las cosas claras y disfrutas debatiendo.",
+      "easy": "las ideas se convierten en acción: piensas con decisión y sabes defender lo que dices sin herir.",
+      "hard": "las palabras se calientan y las ideas se vuelven armas; bajar el ritmo convierte la discusión en claridad."
+    },
+    "mercury-jupiter": {
+      "conj": "la mente busca el panorama completo: curiosidad amplia, gusto por enseñar y facilidad para conectar ideas.",
+      "easy": "el pensamiento encuentra sentido: aprendes con gusto y sabes ver lo importante sin perderte.",
+      "hard": "las ideas se inflan o se dispersan; aterrizar la visión en detalles concretos la vuelve útil."
+    },
+    "mercury-saturn": {
+      "conj": "la mente es seria y estructurada: piensas con cuidado, dudas antes de hablar y tus ideas tienen peso.",
+      "easy": "el pensamiento gana disciplina: sabes concentrarte, planificar y explicar con precisión.",
+      "hard": "la duda y la autocrítica frenan la palabra; lo que cuesta decir suele ser lo que más merece pensarse a fondo."
+    },
+    "mercury-uranus": {
+      "conj": "la mente da saltos: intuiciones rápidas, ideas fuera de lo común y poca paciencia con lo obvio.",
+      "easy": "lo original encuentra palabras: piensas distinto y sabes contarlo de forma que se entienda.",
+      "hard": "la mente se acelera y pierde el hilo; las ideas brillantes llegan a trompicones y piden tiempo para asentarse."
+    },
+    "mercury-neptune": {
+      "conj": "la mente piensa en imágenes: imaginación poética, intuición y cierta dificultad con lo literal y lo exacto.",
+      "easy": "la imaginación encuentra lenguaje: sabes contar lo que no se ve y escuchar lo que no se dice.",
+      "hard": "lo que piensas se nubla con lo que deseas o temes; contrastar los datos protege la intuición de la confusión."
+    },
+    "mercury-pluto": {
+      "conj": "la mente va al fondo: investigas, desconfías de lo superficial y tus palabras pesan.",
+      "easy": "el pensamiento penetra: llegas a la raíz de los problemas y sabes persuadir sin forzar.",
+      "hard": "las palabras se vuelven pulso: una idea fija o la necesidad de tener razón; escuchar desactiva el choque."
+    },
+    "venus-mars": {
+      "conj": "el deseo y el afecto se juntan: atraes y buscas con la misma energía, con mucha vida en lo erótico y lo creativo.",
+      "easy": "lo que deseas y lo que valoras van de la mano: sabes querer con iniciativa y recibir sin perder fuerza.",
+      "hard": "el deseo y el afecto se tensan: lo que atrae no siempre es lo que cuida; esa tensión también es chispa creativa."
+    },
+    "venus-jupiter": {
+      "conj": "el afecto y la generosidad se amplían: disfrutas, compartes y esperas lo mejor de los demás.",
+      "easy": "el placer y la confianza se apoyan: los vínculos sientan bien y la gratitud se nota.",
+      "hard": "el gusto se desborda en exceso o en idealización; disfrutar con medida no quita alegría."
+    },
+    "venus-saturn": {
+      "conj": "el afecto se toma en serio: quieres con lealtad, tardas en abrirte y valoras lo que resiste al tiempo.",
+      "easy": "el compromiso da forma al afecto: los vínculos maduran y el gusto se vuelve sobrio y duradero.",
+      "hard": "el miedo a no ser querido frena el afecto; el trabajo es aprender que el cariño no hay que ganárselo."
+    },
+    "venus-uranus": {
+      "conj": "el afecto necesita libertad: atrae lo distinto, y los vínculos funcionan mejor con espacio.",
+      "easy": "la independencia y el amor conviven: puedes estar cerca sin perderte, y el gusto se renueva.",
+      "hard": "la necesidad de cercanía y la de libertad chocan; los cambios súbitos en el afecto piden acuerdos nuevos, no huidas."
+    },
+    "venus-neptune": {
+      "conj": "el afecto se idealiza: amas con ternura y sentido de lo sagrado, y es fácil ver en el otro lo que deseas.",
+      "easy": "el gusto se vuelve inspiración: sensibilidad artística, compasión y una forma delicada de querer.",
+      "hard": "el ideal y la persona real se separan; ver al otro tal como es convierte la ilusión en un amor más hondo."
+    },
+    "venus-pluto": {
+      "conj": "el afecto es intenso y total: los vínculos transforman, y la superficialidad no interesa.",
+      "easy": "la intensidad enriquece el afecto: los vínculos profundos regeneran y sabes sostener lo difícil dentro de ellos.",
+      "hard": "en el afecto asoman celos, posesión o miedo a perder; reconocerlos sin actuarlos transforma la relación."
+    },
+    "mars-jupiter": {
+      "conj": "la energía se pone al servicio de algo grande: entusiasmo, valor y ganas de ir más allá.",
+      "easy": "la acción encuentra sentido: actúas con confianza, y la iniciativa suele dar buenos frutos.",
+      "hard": "el empuje se pasa de frenada: se arriesga de más o se quiere todo ya; elegir una causa concentra la fuerza."
+    },
+    "mars-saturn": {
+      "conj": "la energía y el freno van juntos: fuerza contenida que, bien dirigida, aguanta lo que otros no aguantan.",
+      "easy": "la disciplina canaliza la acción: trabajas con constancia y el esfuerzo rinde a largo plazo.",
+      "hard": "el impulso choca con el límite: frustración, bloqueos y rabia contenida; el ritmo lento acaba siendo la fuerza."
+    },
+    "mars-uranus": {
+      "conj": "la energía es eléctrica y repentina: actúas por impulso, te rebelas rápido y necesitas moverte libre.",
+      "easy": "la acción se renueva: te atreves con lo nuevo y reaccionas bien ante lo imprevisto.",
+      "hard": "la impaciencia se dispara: arranques bruscos y ganas de romper con todo; parar un momento evita cortes innecesarios."
+    },
+    "mars-neptune": {
+      "conj": "la acción busca un ideal: actúas por inspiración, aunque la energía a veces se disperse o no sepa adónde ir.",
+      "easy": "la fuerza sirve a la imaginación: pones energía en causas, arte o cuidado, y lo haces con delicadeza.",
+      "hard": "la energía se diluye o se confunde: cuesta saber qué hacer y es fácil cansarse; un objetivo claro ayuda."
+    },
+    "mars-pluto": {
+      "conj": "la energía es intensa y tenaz: cuando quieres algo vas hasta el final, con una fuerza que impresiona un poco.",
+      "easy": "la voluntad tiene raíz: resistes, te regeneras y sabes usar tu poder de forma constructiva.",
+      "hard": "la fuerza se vuelve pulso y ganas de imponerse; reconocer el miedo que hay debajo de la rabia la transforma."
+    },
+    "jupiter-saturn": {
+      "conj": "la confianza y la prudencia se juntan: crecimiento con estructura, ideales con plan.",
+      "easy": "la visión y el método colaboran: sabes cuándo ampliar y cuándo consolidar.",
+      "hard": "el deseo de crecer y el miedo a fallar tiran en contra; alternar los dos ritmos sin culpa trae equilibrio."
+    },
+    "jupiter-uranus": {
+      "conj": "la expansión llega por lo inesperado: ganas de libertad, ideas nuevas y golpes de lucidez.",
+      "easy": "la confianza y la originalidad se apoyan: lo nuevo abre puertas y los cambios ensanchan.",
+      "hard": "la necesidad de libertad se desborda en rupturas impulsivas o planes enormes; elegir qué cambio vale la pena lo aterriza."
+    },
+    "jupiter-neptune": {
+      "conj": "la fe y la imaginación se amplían: compasión, idealismo y sentido de lo trascendente, con riesgo de perder el contorno.",
+      "easy": "la inspiración encuentra sentido: la generosidad y la imaginación se alimentan entre sí.",
+      "hard": "el ideal crece sin suelo: es fácil esperar demasiado o creer lo que se quiere creer; contrastar protege la fe."
+    },
+    "jupiter-pluto": {
+      "conj": "la ambición y la intensidad se juntan: deseo de influir, de transformar a lo grande y de ir a fondo.",
+      "easy": "la confianza y la fuerza interior se ayudan: sabes regenerarte y crecer después de las crisis.",
+      "hard": "el afán de crecer se vuelve deseo de poder; preguntarse para qué se quiere tanto devuelve la medida."
+    },
+    "saturn-uranus": {
+      "conj": "lo viejo y lo nuevo conviven en tensión: necesitas estructura y libertad a la vez, y aprendes a reformar sin destruir.",
+      "easy": "la tradición y el cambio se entienden: sabes innovar con método y dar forma a lo nuevo.",
+      "hard": "la necesidad de orden choca con la de ruptura; integrar las dos permite cambiar sin perder lo que funciona."
+    },
+    "saturn-neptune": {
+      "conj": "el sueño busca forma: dar cuerpo a un ideal, con la duda de si lo real alcanzará a lo imaginado.",
+      "easy": "la imaginación y la disciplina se ayudan: puedes construir algo que nace de un sueño.",
+      "hard": "el ideal y la realidad se miran con recelo: desencanto o miedo difuso; aceptar lo posible no traiciona el sueño."
+    },
+    "saturn-pluto": {
+      "conj": "la estructura y la intensidad se juntan: mucha resistencia, presión de fondo y capacidad para reconstruir desde cero.",
+      "easy": "la disciplina y la fuerza profunda colaboran: puedes sostener transformaciones largas con paciencia.",
+      "hard": "las estructuras se ponen a prueba bajo presión; lo que no sirve cae, y lo que queda es más sólido."
+    },
+    "uranus-neptune": {
+      "conj": "la ruptura y el sueño se juntan: ideales nuevos y formas distintas de imaginar, con un fondo que es también de época.",
+      "easy": "la intuición y la innovación se ayudan: lo imaginado encuentra vías nuevas para hacerse real.",
+      "hard": "el deseo de cambio y el de disolverse se cruzan: una inquietud difusa que pide distinguir la visión de la evasión."
+    },
+    "uranus-pluto": {
+      "conj": "el cambio y la transformación se juntan: ganas de romper reglas viejas y rehacer desde la raíz, con un fondo que es también de época.",
+      "easy": "el cambio y la profundidad se apoyan: las transformaciones llegan con lucidez y dejan algo renovado.",
+      "hard": "la ruptura y la presión se empujan: un clima de cambio que pide saber qué quieres transformar tú."
+    },
+    "neptune-pluto": {
+      "conj": "el sueño y la transformación lenta se juntan: una corriente de fondo, de época, más que un rasgo personal.",
+      "easy": "la imaginación y la regeneración van de la mano: un fondo de época que favorece renovar sentidos y creencias.",
+      "hard": "el ideal y la transformación profunda se tensan: un clima más colectivo que personal que pide revisar en qué crees."
+    }
+  }
+}

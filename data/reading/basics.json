@@ -1,0 +1,132 @@
+{
+  "modes": {
+    "traditional": {
+      "label": "tradicional",
+      "about": "la lectura de la astrología helenística y medieval (ptolomeo, valens, lilly): siete planetas, dignidades y casas como partes de la vida."
+    },
+    "modern": {
+      "label": "contemporánea",
+      "about": "la lectura psicológica del siglo xx en adelante: diez planetas, con urano, neptuno y plutón, y la carta como mapa de cómo eres por dentro."
+    }
+  },
+  "planets": {
+    "sun": {
+      "traditional": "la luminaria del día: la vitalidad, el padre, la autoridad y el lugar que se ocupa.",
+      "modern": "la identidad: lo que te da sentido y te hace brillar.",
+      "transit": {
+        "traditional": "pone luz y atención en lo que toca",
+        "modern": "enciende ahí tu foco y tus ganas"
+      }
+    },
+    "moon": {
+      "traditional": "la luminaria de la noche: el cuerpo, la madre, el día a día y lo que cambia.",
+      "modern": "las emociones y las necesidades: lo que te hace sentir en casa.",
+      "transit": {
+        "traditional": "mueve el ánimo y los asuntos de cada día",
+        "modern": "colorea el humor de estas horas"
+      }
+    },
+    "mercury": {
+      "traditional": "el mensajero: la palabra, el cálculo, los papeles y los oficios. toma el color de con quién va.",
+      "modern": "la mente: cómo piensas, aprendes y lo cuentas.",
+      "transit": {
+        "traditional": "trae mensajes, papeles y conversaciones",
+        "modern": "pone la cabeza a pensar y a hablar de ello"
+      }
+    },
+    "venus": {
+      "traditional": "el benéfico menor: el amor, el placer, la belleza y lo que une.",
+      "modern": "lo que amas y valoras: cómo te vinculas y qué te gusta.",
+      "transit": {
+        "traditional": "suaviza, une y trae algo agradable",
+        "modern": "abre el gusto, el cariño y las ganas de disfrutar"
+      }
+    },
+    "mars": {
+      "traditional": "el maléfico menor: el fuego, el corte, la pelea y el valor.",
+      "modern": "el deseo y la acción: cómo vas a por lo que quieres.",
+      "transit": {
+        "traditional": "calienta, acelera y puede cortar",
+        "modern": "empuja a actuar y saca el genio"
+      }
+    },
+    "jupiter": {
+      "traditional": "el benéfico mayor: la abundancia, la ley, la fe y la protección.",
+      "modern": "la expansión: la confianza, el sentido y las ganas de crecer.",
+      "transit": {
+        "traditional": "amplía, protege y abre puertas",
+        "modern": "invita a crecer y a confiar"
+      }
+    },
+    "saturn": {
+      "traditional": "el maléfico mayor: el frío, el tiempo, los límites y lo que dura.",
+      "modern": "la estructura: la responsabilidad, los miedos y lo que se construye despacio.",
+      "transit": {
+        "traditional": "enfría, retrasa y pone a prueba",
+        "modern": "pide madurez, orden y paciencia"
+      }
+    },
+    "uranus": {
+      "traditional": "la tradición no lo usa: se descubrió en 1781.",
+      "modern": "el cambio y la libertad: lo que rompe moldes de golpe.",
+      "transit": {
+        "traditional": "sacude lo establecido",
+        "modern": "trae lo inesperado y ganas de libertad"
+      }
+    },
+    "neptune": {
+      "traditional": "la tradición no lo usa: se descubrió en 1846.",
+      "modern": "la disolución y el sueño: la inspiración, la compasión y la niebla.",
+      "transit": {
+        "traditional": "difumina los contornos",
+        "modern": "inspira y confunde a partes iguales"
+      }
+    },
+    "pluto": {
+      "traditional": "la tradición no lo usa: se descubrió en 1930.",
+      "modern": "la transformación: el poder, lo oculto y lo que muere para renacer.",
+      "transit": {
+        "traditional": "remueve desde el fondo",
+        "modern": "transforma a fondo, despacio y sin vuelta atrás"
+      }
+    },
+    "asc": {
+      "traditional": "el horóscopo, la hora que marca: el cuerpo, el temperamento y el timón de la vida.",
+      "modern": "la puerta de entrada: cómo te presentas y cómo empiezas las cosas."
+    }
+  },
+  "houses": {
+    "traditional": {
+      "1": "vida, cuerpo, carácter",
+      "2": "sustento, recursos",
+      "3": "hermanos, entorno cercano, viajes cortos",
+      "4": "padres, casa, raíces",
+      "5": "hijos, placer, buena fortuna",
+      "6": "esfuerzo, trabajo, salud",
+      "7": "pareja, acuerdos, rivales",
+      "8": "herencias, lo de otros, lo que se acaba",
+      "9": "fe, estudios, extranjero",
+      "10": "obra, acción, reputación",
+      "11": "amistades, aliados, beneficios",
+      "12": "lo oculto, pérdidas, enemigos escondidos"
+    },
+    "modern": {
+      "1": "identidad, cómo entras en el mundo",
+      "2": "valores, autoestima, recursos",
+      "3": "mente, comunicación, entorno",
+      "4": "raíces, familia, mundo interior",
+      "5": "creatividad, juego, amor",
+      "6": "rutinas, cuerpo, oficio",
+      "7": "relaciones de igual a igual",
+      "8": "intimidad, crisis, transformación",
+      "9": "sentido, viajes, horizontes",
+      "10": "vocación, lugar en el mundo",
+      "11": "comunidad, amistades, futuro",
+      "12": "inconsciente, retiro, lo que se suelta"
+    }
+  },
+  "notes": {
+    "outer": "la tradición no usa urano, neptuno ni plutón: de ellos va la lectura contemporánea.",
+    "about": "lectura orientativa: la astrología es una tradición simbólica, no una ciencia."
+  }
+}

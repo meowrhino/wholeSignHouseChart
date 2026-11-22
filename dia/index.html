@@ -78,16 +78,16 @@
         <div class="campo"><label for="q">lugar</label>
           <span class="con-boton"><input id="q" placeholder="ciudad, país" /><button id="btnGeo">buscar</button></span>
         </div>
-        <div class="campo"><label for="lat">lat · lon</label>
-          <span class="par"><input id="lat" type="number" step="0.000001" placeholder="41.388" aria-label="latitud" /><input id="lon" type="number" step="0.000001" placeholder="2.170" aria-label="longitud, este positivo" /></span>
-        </div>
         <div class="campo"><label for="tzSelect">zona</label><select id="tzSelect"></select></div>
-        <div class="campo"><span></span>
-          <label class="toggle on" id="tglVisible"><input type="checkbox" id="chkVisible" checked><span class="lbl">solo planetas visibles</span><span class="pill" id="stateVisible">on</span></label>
-        </div>
 
         <div id="advPanel" hidden>
           <h2>más opciones</h2>
+        <div class="campo"><label for="lat">lat · lon</label>
+          <span class="par"><input id="lat" type="number" step="0.000001" placeholder="41.388" aria-label="latitud" /><input id="lon" type="number" step="0.000001" placeholder="2.170" aria-label="longitud, este positivo" /></span>
+        </div>
+        <div class="campo"><span></span>
+          <label class="toggle on" id="tglVisible"><input type="checkbox" id="chkVisible" checked><span class="lbl">solo planetas visibles</span><span class="pill" id="stateVisible">on</span></label>
+        </div>
           <div class="campo"><span class="etiqueta">objetos</span>
             <span class="opciones">
               <label class="toggle" id="tglNodes"><input type="checkbox" id="objNodes"><span class="lbl">nodos lunares</span><span class="pill">off</span></label>
@@ -118,14 +118,13 @@
               <label class="toggle" id="tglSect"><input type="checkbox" id="tradSect"><span class="lbl">secta diurna / nocturna</span><span class="pill">off</span></label>
             </span>
           </div>
+          <p class="acciones"><button id="btnNow">rellenar con aquí y ahora</button><button id="btnExample">cargar un ejemplo</button></p>
           <p class="mini nota">todo opcional: por defecto la carta es whole sign con aspectos por signos.</p>
         </div>
 
         <p class="acciones">
-          <button id="btnDraw" class="principal">dibujar la carta</button>
-          <button id="btnNow">aquí y ahora</button>
-          <button id="btnSkyNow">cielo ahora</button>
-          <button id="btnExample">ejemplo</button>
+          <button id="btnDraw" class="principal">dibujar mi carta</button>
+          <button id="btnSkyNow">o mira el cielo ahora</button>
           <button id="btnSave" hidden>guardar carta</button>
           <button id="btnTest" hidden>autotest</button>
         </p>
@@ -145,6 +144,9 @@
 
       <div id="chartZone">
 
+        <section id="hoy" class="bloque" hidden></section>
+        <section id="lectura" class="bloque"></section>
+
         <section id="transitBox" class="bloque">
           <h2>tránsitos <span class="mini">el cielo de otro momento sobre esta carta</span></h2>
           <div id="trCtrl" style="display:none">
@@ -155,6 +157,9 @@
             <div id="trAspects" class="legend"></div>
           </div>
         </section>
+
+        <details class="bloque tablas">
+          <summary>tablas y datos</summary>
 
         <section class="bloque">
           <h2>planetas <span class="mini">signo, grado y dignidad</span></h2>
@@ -187,6 +192,7 @@
           </p>
           <div id="anglesInfo"></div>
         </section>
+        </details>
 
       </div>
     </div>
@@ -195,6 +201,7 @@
   <a class="firma" href="https://meowrhino.studio">meowrhino studio</a>
 
   <script src="../carta.js"></script>
+  <script src="../lectura.js"></script>
   <script src="estilo.js"></script>
   <script src="../comun.js"></script>
 </body>

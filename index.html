@@ -11,9 +11,10 @@
   <script>
     // la carta tiene dos caras: día (blanca) y noche (negra). manda la que eligió la persona con el enlace
     // día/noche; si no eligió, la del modo claro u oscuro de su sistema. la carta va en la url y se conserva.
-    let cara; try { cara = localStorage.getItem('astro-cara'); } catch (_) { }
+    // sin carta en la url, abre la última que se dibujó en este navegador
+    let cara, ultima = ''; try { cara = localStorage.getItem('astro-cara'); ultima = localStorage.getItem('astro-ultima') || ''; } catch (_) { }
     if (cara !== 'dia' && cara !== 'noche') cara = matchMedia('(prefers-color-scheme: dark)').matches ? 'noche' : 'dia';
-    location.replace(cara + '/' + location.search);
+    location.replace(cara + '/' + (location.search || ultima));
   </script>
   <style>
     body { margin: 0; padding: 24px; font: 15px/1.5 Georgia, serif; text-transform: lowercase; }

@@ -90,7 +90,7 @@
           <button id="btnGeo" hidden>buscar</button>
           <button id="btnDraw" class="fuerte">dibujar</button>
           <button id="btnMas" class="flojo" aria-expanded="false">detalles</button>
-          <a class="flojo" href="#tablas">tablas ↓</a>
+          <a class="flojo" href="#lee">lectura ↓</a>
         </div>
         <div id="status" class="mini"></div>
 
@@ -182,7 +182,14 @@
     </div>
   </main>
 
-  <!-- debajo: las tablas -->
+  <!-- debajo: la lectura y, plegadas, las tablas -->
+  <section id="lee">
+    <section id="hoy" hidden></section>
+    <section id="lectura"></section>
+  </section>
+
+  <details id="plegadas">
+  <summary>tablas y datos</summary>
   <section id="tablas">
     <div class="sec">
       <h2>planetas</h2>
@@ -214,10 +221,12 @@
       <div id="anglesInfo"></div>
     </div>
   </section>
+  </details>
 
   <a class="firma" href="https://meowrhino.studio">meowrhino studio</a>
 
   <script src="../carta.js"></script>
+  <script src="../lectura.js"></script>
   <script src="estilo.js"></script>
   <script src="../comun.js"></script>
 </body>

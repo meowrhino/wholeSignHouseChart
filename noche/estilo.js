@@ -39,19 +39,9 @@
     requestAnimationFrame(() => { arrastrando = false; syncURL = syncOriginal; syncURL(); });
   });
 
-  // ===== la frase: "dibujar" busca el lugar si ha cambiado y luego dibuja =====
-  let qHecho = $('#q').value.trim();
-  async function dibujar() {
-    const q = $('#q').value.trim();
-    if (q && q !== qHecho) { await geocode(); qHecho = q; }
-    computeAndDraw();
-  }
-  // en captura, antes del listener de carta.js en #btnDraw
-  $('.frase').addEventListener('click', e => {
-    if (e.target.closest('#btnDraw')) { e.stopPropagation(); dibujar(); }
-  }, true);
+  // ===== la frase: enter en un campo = "dibujar" (carta.js busca el lugar si ha cambiado) =====
   $('.frase').addEventListener('keydown', e => {
-    if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); dibujar(); }
+    if (e.key === 'Enter' && e.target.matches('input')) { e.preventDefault(); $('#btnDraw').click(); }
   });
 
   // ===== enlaces de texto que abren y cierran =====
