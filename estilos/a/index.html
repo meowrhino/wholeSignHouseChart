@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex">
+  <title>carta natal whole sign — meowrhino studio</title>
+  <meta name="description" content="carta natal whole sign: la rueda, los planetas con su dignidad, los aspectos por signos y las casas. hecha por meowrhino studio.">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../favicon/apple-touch-icon.png">
+  <!-- camino a · almanaque impreso: papel blanco, tinta negra, rojo solo para lo tenso. misma lógica (../../carta.js), mismos id. -->
+  <link rel="stylesheet" href="../comun.css">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+  <canvas id="estrellas-canvas" hidden></canvas>
+
+  <header id="toolbar" class="esquina">
+    <a class="marca" href="./">carta natal</a>
+    <nav class="menu">
+      <label class="ver"><input type="checkbox" id="verCartas">cartas guardadas</label>
+      <label class="toggle ver solo-carta" id="tglTr"><input type="checkbox" id="chkTr"><span class="lbl">tránsitos</span><span class="pill">off</span></label>
+      <button type="button" id="btnAdv" aria-expanded="false">más opciones</button>
+      <button id="btnSaveTop" class="solo-carta">guardar</button>
+      <button id="btnShare" class="solo-carta">compartir enlace</button>
+      <button id="btnExport" class="solo-carta">exportar png</button>
+      <button id="btnBack" hidden>editar</button>
+    </nav>
+  </header>
+
+  <main class="pliego">
+
+    <!-- la lámina: la rueda manda -->
+    <figure class="lamina">
+      <div id="chartBox">
+        <svg id="chartSvg" viewBox="0 0 1120 1120" xmlns="http://www.w3.org/2000/svg"><g class="vacia" fill="none" stroke="currentColor"><circle cx="560" cy="560" r="480" stroke-width="1.2"/><circle cx="560" cy="560" r="410"/><circle cx="560" cy="560" r="220"/><g opacity=".35"><line x1="340.0" y1="560.0" x2="150.0" y2="560.0"/><line x1="369.5" y1="670.0" x2="204.9" y2="765.0"/><line x1="450.0" y1="750.5" x2="355.0" y2="915.1"/><line x1="560.0" y1="780.0" x2="560.0" y2="970.0"/><line x1="670.0" y1="750.5" x2="765.0" y2="915.1"/><line x1="750.5" y1="670.0" x2="915.1" y2="765.0"/><line x1="780.0" y1="560.0" x2="970.0" y2="560.0"/><line x1="750.5" y1="450.0" x2="915.1" y2="355.0"/><line x1="670.0" y1="369.5" x2="765.0" y2="204.9"/><line x1="560.0" y1="340.0" x2="560.0" y2="150.0"/><line x1="450.0" y1="369.5" x2="355.0" y2="204.9"/><line x1="369.5" y1="450.0" x2="204.9" y2="355.0"/></g><g stroke-width=".8"><line x1="80.0" y1="560.0" x2="93.0" y2="560.0"/><line x1="81.8" y1="601.8" x2="87.8" y2="601.3"/><line x1="87.3" y1="643.4" x2="96.2" y2="641.8"/><line x1="96.4" y1="684.2" x2="102.2" y2="682.7"/><line x1="108.9" y1="724.2" x2="117.4" y2="721.1"/><line x1="125.0" y1="762.9" x2="130.4" y2="760.3"/><line x1="144.3" y1="800.0" x2="155.6" y2="793.5"/><line x1="166.8" y1="835.3" x2="171.7" y2="831.9"/><line x1="192.3" y1="868.5" x2="199.2" y2="862.8"/><line x1="220.6" y1="899.4" x2="224.8" y2="895.2"/><line x1="251.5" y1="927.7" x2="257.2" y2="920.8"/><line x1="284.7" y1="953.2" x2="288.1" y2="948.3"/><line x1="320.0" y1="975.7" x2="326.5" y2="964.4"/><line x1="357.1" y1="995.0" x2="359.7" y2="989.6"/><line x1="395.8" y1="1011.1" x2="398.9" y2="1002.6"/><line x1="435.8" y1="1023.6" x2="437.3" y2="1017.8"/><line x1="476.6" y1="1032.7" x2="478.2" y2="1023.8"/><line x1="518.2" y1="1038.2" x2="518.7" y2="1032.2"/><line x1="560.0" y1="1040.0" x2="560.0" y2="1027.0"/><line x1="601.8" y1="1038.2" x2="601.3" y2="1032.2"/><line x1="643.4" y1="1032.7" x2="641.8" y2="1023.8"/><line x1="684.2" y1="1023.6" x2="682.7" y2="1017.8"/><line x1="724.2" y1="1011.1" x2="721.1" y2="1002.6"/><line x1="762.9" y1="995.0" x2="760.3" y2="989.6"/><line x1="800.0" y1="975.7" x2="793.5" y2="964.4"/><line x1="835.3" y1="953.2" x2="831.9" y2="948.3"/><line x1="868.5" y1="927.7" x2="862.8" y2="920.8"/><line x1="899.4" y1="899.4" x2="895.2" y2="895.2"/><line x1="927.7" y1="868.5" x2="920.8" y2="862.8"/><line x1="953.2" y1="835.3" x2="948.3" y2="831.9"/><line x1="975.7" y1="800.0" x2="964.4" y2="793.5"/><line x1="995.0" y1="762.9" x2="989.6" y2="760.3"/><line x1="1011.1" y1="724.2" x2="1002.6" y2="721.1"/><line x1="1023.6" y1="684.2" x2="1017.8" y2="682.7"/><line x1="1032.7" y1="643.4" x2="1023.8" y2="641.8"/><line x1="1038.2" y1="601.8" x2="1032.2" y2="601.3"/><line x1="1040.0" y1="560.0" x2="1027.0" y2="560.0"/><line x1="1038.2" y1="518.2" x2="1032.2" y2="518.7"/><line x1="1032.7" y1="476.6" x2="1023.8" y2="478.2"/><line x1="1023.6" y1="435.8" x2="1017.8" y2="437.3"/><line x1="1011.1" y1="395.8" x2="1002.6" y2="398.9"/><line x1="995.0" y1="357.1" x2="989.6" y2="359.7"/><line x1="975.7" y1="320.0" x2="964.4" y2="326.5"/><line x1="953.2" y1="284.7" x2="948.3" y2="288.1"/><line x1="927.7" y1="251.5" x2="920.8" y2="257.2"/><line x1="899.4" y1="220.6" x2="895.2" y2="224.8"/><line x1="868.5" y1="192.3" x2="862.8" y2="199.2"/><line x1="835.3" y1="166.8" x2="831.9" y2="171.7"/><line x1="800.0" y1="144.3" x2="793.5" y2="155.6"/><line x1="762.9" y1="125.0" x2="760.3" y2="130.4"/><line x1="724.2" y1="108.9" x2="721.1" y2="117.4"/><line x1="684.2" y1="96.4" x2="682.7" y2="102.2"/><line x1="643.4" y1="87.3" x2="641.8" y2="96.2"/><line x1="601.8" y1="81.8" x2="601.3" y2="87.8"/><line x1="560.0" y1="80.0" x2="560.0" y2="93.0"/><line x1="518.2" y1="81.8" x2="518.7" y2="87.8"/><line x1="476.6" y1="87.3" x2="478.2" y2="96.2"/><line x1="435.8" y1="96.4" x2="437.3" y2="102.2"/><line x1="395.8" y1="108.9" x2="398.9" y2="117.4"/><line x1="357.1" y1="125.0" x2="359.7" y2="130.4"/><line x1="320.0" y1="144.3" x2="326.5" y2="155.6"/><line x1="284.7" y1="166.8" x2="288.1" y2="171.7"/><line x1="251.5" y1="192.3" x2="257.2" y2="199.2"/><line x1="220.6" y1="220.6" x2="224.8" y2="224.8"/><line x1="192.3" y1="251.5" x2="199.2" y2="257.2"/><line x1="166.8" y1="284.7" x2="171.7" y2="288.1"/><line x1="144.3" y1="320.0" x2="155.6" y2="326.5"/><line x1="125.0" y1="357.1" x2="130.4" y2="359.7"/><line x1="108.9" y1="395.8" x2="117.4" y2="398.9"/><line x1="96.4" y1="435.8" x2="102.2" y2="437.3"/><line x1="87.3" y1="476.6" x2="96.2" y2="478.2"/><line x1="81.8" y1="518.2" x2="87.8" y2="518.7"/></g></g><g class="vacia" fill="currentColor" font-size="24" text-anchor="middle" dominant-baseline="central" font-family="'Noto Sans Symbols 2','Segoe UI Symbol','DejaVu Sans','Symbola',sans-serif"><text x="130.2" y="679.2">♈︎</text><text x="245.3" y="878.7">♉︎</text><text x="444.8" y="993.8">♊︎</text><text x="675.2" y="993.8">♋︎</text><text x="874.7" y="878.7">♌︎</text><text x="989.8" y="679.2">♍︎</text><text x="989.8" y="448.8">♎︎</text><text x="874.7" y="249.3">♏︎</text><text x="675.2" y="134.2">♐︎</text><text x="444.8" y="134.2">♑︎</text><text x="245.3" y="249.3">♒︎</text><text x="130.2" y="448.8">♓︎</text></g></svg>
+        <div id="tip" hidden></div>
+      </div>
+      <figcaption>
+        <div id="summary"></div>
+        <div id="layerChips"></div>
+      </figcaption>
+    </figure>
+
+    <!-- la hoja: datos y tablas -->
+    <div class="hoja">
+
+      <section id="formZone">
+        <div class="campo"><label for="name">nombre</label><input id="name" placeholder="opcional" /></div>
+        <div class="campo"><label for="date">fecha</label><input id="date" type="date" /></div>
+        <div class="campo"><label for="time">hora</label><input id="time" type="time" step="60" /></div>
+        <div class="campo"><span></span>
+          <label class="toggle" id="tglUnknown"><input type="checkbox" id="chkUnknownTime"><span class="lbl">no conozco la hora</span><span class="pill" id="stateUnknown">off</span></label>
+        </div>
+        <div id="unknownExtras" style="display:none">
+          <div class="campo"><label for="suspectAsc">casas</label>
+            <select id="suspectAsc">
+              <option value="">sin casas</option>
+              <option value="0">asc sospechado: aries</option>
+              <option value="1">asc sospechado: tauro</option>
+              <option value="2">asc sospechado: géminis</option>
+              <option value="3">asc sospechado: cáncer</option>
+              <option value="4">asc sospechado: leo</option>
+              <option value="5">asc sospechado: virgo</option>
+              <option value="6">asc sospechado: libra</option>
+              <option value="7">asc sospechado: escorpio</option>
+              <option value="8">asc sospechado: sagitario</option>
+              <option value="9">asc sospechado: capricornio</option>
+              <option value="10">asc sospechado: acuario</option>
+              <option value="11">asc sospechado: piscis</option>
+            </select>
+          </div>
+          <p class="mini nota">con un signo, casas whole sign y aspectos por signos a ese asc. sin signo, no hay casas.</p>
+        </div>
+        <div class="campo"><label for="q">lugar</label>
+          <span class="con-boton"><input id="q" placeholder="ciudad, país" /><button id="btnGeo">buscar</button></span>
+        </div>
+        <div class="campo"><label for="lat">lat · lon</label>
+          <span class="par"><input id="lat" type="number" step="0.000001" placeholder="41.388" aria-label="latitud" /><input id="lon" type="number" step="0.000001" placeholder="2.170" aria-label="longitud, este positivo" /></span>
+        </div>
+        <div class="campo"><label for="tzSelect">zona</label><select id="tzSelect"></select></div>
+        <div class="campo"><span></span>
+          <label class="toggle on" id="tglVisible"><input type="checkbox" id="chkVisible" checked><span class="lbl">solo planetas visibles</span><span class="pill" id="stateVisible">on</span></label>
+        </div>
+
+        <div id="advPanel" hidden>
+          <h2>más opciones</h2>
+          <div class="campo"><span class="etiqueta">objetos</span>
+            <span class="opciones">
+              <label class="toggle" id="tglNodes"><input type="checkbox" id="objNodes"><span class="lbl">nodos lunares</span><span class="pill">off</span></label>
+              <label class="toggle" id="tglLilith"><input type="checkbox" id="objLilith"><span class="lbl">lilith</span><span class="pill">off</span></label>
+              <label class="toggle" id="tglChiron"><input type="checkbox" id="objChiron"><span class="lbl">quirón ≈</span><span class="pill">off</span></label>
+              <label class="toggle" id="tglFortune"><input type="checkbox" id="objFortune"><span class="lbl">parte de la fortuna</span><span class="pill">off</span></label>
+            </span>
+          </div>
+          <div class="campo"><label for="houseSystem">casas</label>
+            <select id="houseSystem">
+              <option value="whole" selected>whole sign</option>
+              <option value="equal">igual</option>
+              <option value="placidus">placidus</option>
+            </select>
+          </div>
+          <div class="campo"><label for="aspectMode">aspectos</label>
+            <select id="aspectMode">
+              <option value="sign" selected>por signos</option>
+              <option value="degree">por grado, con orbe</option>
+            </select>
+          </div>
+          <div id="orbRow" style="display:none">
+            <div class="campo"><label for="orbMax">orbe <b id="orbVal">6</b>°</label><input type="range" id="orbMax" min="1" max="10" step="0.5" value="6"></div>
+          </div>
+          <div class="campo"><span class="etiqueta">tradición</span>
+            <span class="opciones">
+              <label class="toggle" id="tglRetro"><input type="checkbox" id="tradRetro"><span class="lbl">marca ℞ de retrogradación</span><span class="pill">off</span></label>
+              <label class="toggle" id="tglSect"><input type="checkbox" id="tradSect"><span class="lbl">secta diurna / nocturna</span><span class="pill">off</span></label>
+            </span>
+          </div>
+          <p class="mini nota">todo opcional: por defecto la carta es whole sign con aspectos por signos.</p>
+        </div>
+
+        <p class="acciones">
+          <button id="btnDraw" class="principal">dibujar la carta</button>
+          <button id="btnNow">aquí y ahora</button>
+          <button id="btnSkyNow">cielo ahora</button>
+          <button id="btnExample">ejemplo</button>
+          <button id="btnSave" hidden>guardar carta</button>
+          <button id="btnTest" hidden>autotest</button>
+        </p>
+        <p id="status" class="mini"></p>
+        <div id="testout" class="mini"></div>
+      </section>
+
+      <section id="libraryBox" class="bloque">
+        <h2>cartas guardadas <span class="mini">en este navegador</span></h2>
+        <div id="libraryList" class="legend"></div>
+        <p class="acciones">
+          <button id="btnExportLib">exportar json</button>
+          <button id="btnImportLib">importar json</button>
+        </p>
+        <input type="file" id="fileImport" accept=".json,application/json" hidden>
+      </section>
+
+      <div id="chartZone">
+
+        <section id="transitBox" class="bloque">
+          <h2>tránsitos <span class="mini">el cielo de otro momento sobre esta carta</span></h2>
+          <div id="trCtrl" style="display:none">
+            <div class="campo"><label for="trDate">fecha</label><input id="trDate" type="date"></div>
+            <div class="campo"><label for="trTime">hora</label><input id="trTime" type="time" step="60"></div>
+            <p class="acciones"><button id="btnTrNow">ahora</button></p>
+            <p class="mini nota">anillo de fuera: planetas de ese momento. aspectos tránsito → natal por grado, orbe máx. 3°.</p>
+            <div id="trAspects" class="legend"></div>
+          </div>
+        </section>
+
+        <section class="bloque">
+          <h2>planetas <span class="mini">signo, grado y dignidad</span></h2>
+          <div id="readout" class="legend"></div>
+        </section>
+
+        <section class="bloque">
+          <h2>aspectos al ascendente</h2>
+          <div id="ascAspects" class="legend"></div>
+        </section>
+
+        <section class="bloque">
+          <h2>aspectos entre planetas</h2>
+          <div id="ppAspects" class="legend columnas"></div>
+        </section>
+
+        <section class="bloque">
+          <h2>casas</h2>
+          <p class="mini nota">en whole sign cada casa es un signo entero; la casa i empieza en el signo del asc.</p>
+          <div id="houses" class="legend"></div>
+        </section>
+
+        <section class="bloque notas">
+          <h2>qué estás viendo</h2>
+          <p class="mini">
+            <i>dignidades</i>: fuerza o debilidad clásica de un planeta en un signo — domicilio, exaltación, detrimento,
+            caída; si no aplica, peregrino.
+            <i>aspectos por signos</i>: 2 signos, sextil; 3, cuadratura; 4, trígono; 6, oposición.
+            en rojo, los tensos.
+          </p>
+          <div id="anglesInfo"></div>
+        </section>
+
+      </div>
+    </div>
+  </main>
+
+  <a class="firma" href="https://meowrhino.studio">meowrhino studio</a>
+
+  <script src="../../carta.js"></script>
+  <script src="estilo.js"></script>
+</body>
+
+</html>

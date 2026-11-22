@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="robots" content="noindex" />
+  <meta name="theme-color" content="#000000" />
+  <title>cielo ahora — carta natal · meowrhino studio</title>
+  <meta name="description" content="el cielo de este momento como carta natal whole sign; desliza la hora y mira moverse los planetas. hecha por meowrhino studio.">
+  <link rel="icon" type="image/png" sizes="32x32" href="../../favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="../../favicon/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="../../favicon/apple-touch-icon.png">
+  <!-- camino b · cielo ahora: negro y línea blanca. la lógica es la de ../../carta.js, sin cambios;
+       aquí solo cambian estructura y clases (todos los id de la raíz siguen aquí). -->
+  <link rel="stylesheet" href="../comun.css">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+
+<body>
+  <!-- en este camino la rueda ya es el cielo: sin cielo.js -->
+  <canvas id="estrellas-canvas" hidden></canvas>
+
+  <main id="cielo">
+
+    <!-- arriba: qué es (izquierda) y la lista de cosas (derecha) -->
+    <div class="arriba">
+      <div class="que">
+        <div id="summary">cielo ahora</div>
+        <div id="layerChips"></div>
+      </div>
+
+      <nav id="toolbar" class="esquina">
+        <div class="bar">
+          <div class="actions">
+            <button id="btnSkyNow">cielo ahora</button>
+            <button id="btnLib" aria-expanded="false">cartas guardadas</button>
+            <label class="toggle" id="tglTr"><input type="checkbox" id="chkTr"><span class="lbl">tránsitos</span>
+              <span class="pill">off</span></label>
+            <button id="btnSaveTop">guardar</button>
+            <button id="btnShare">compartir enlace</button>
+            <button id="btnExport">exportar png</button>
+            <button id="btnBack" hidden>editar</button>
+          </div>
+        </div>
+
+        <div id="libraryBox" hidden>
+          <div id="libraryList" class="legend"></div>
+          <div class="fila">
+            <button id="btnExportLib">exportar json</button>
+            <button id="btnImportLib">importar json</button>
+          </div>
+          <input type="file" id="fileImport" accept=".json,application/json" hidden>
+        </div>
+
+        <div id="transitBox">
+          <div id="trCtrl" style="display:none">
+            <span class="muted">el</span> <input id="trDate" type="date" aria-label="fecha del tránsito">
+            <span class="muted">a las</span> <input id="trTime" type="time" step="60" aria-label="hora del tránsito">
+            <button id="btnTrNow">ahora</button>
+          </div>
+        </div>
+      </nav>
+    </div>
+
+    <!-- la obra: la rueda -->
+    <div class="wrap canvasWrap" id="chartZone">
+      <div id="chartBox">
+        <svg id="chartSvg" viewBox="0 0 1120 1120" xmlns="http://www.w3.org/2000/svg"></svg>
+        <div id="tip" hidden></div>
+      </div>
+    </div>
+
+    <!-- abajo: el gesto (la hora) y la frase -->
+    <div class="abajo">
+      <div class="hora">
+        <input type="range" id="scrub" min="0" max="1439" step="1" value="720" aria-label="desliza la hora">
+        <div class="marcas" aria-hidden="true"><span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>24h</span></div>
+      </div>
+
+      <div class="wrap" id="formZone">
+        <div class="frase">
+          <input id="name" placeholder="alguien" aria-label="nombre (opcional)" size="8" />
+          <span>nacido el</span>
+          <input id="date" type="date" aria-label="fecha" />
+          <span>a las</span>
+          <input id="time" type="time" step="60" aria-label="hora" />
+          <span>en</span>
+          <input id="q" placeholder="ciudad, país" aria-label="lugar" size="13" />
+          <button id="btnGeo" hidden>buscar</button>
+          <button id="btnDraw" class="fuerte">dibujar</button>
+          <button id="btnMas" class="flojo" aria-expanded="false">detalles</button>
+          <a class="flojo" href="#tablas">tablas ↓</a>
+        </div>
+        <div id="status" class="mini"></div>
+
+        <div id="mas" hidden>
+          <div class="campos">
+            <label>latitud <input id="lat" type="number" step="0.000001" placeholder="41.388" /></label>
+            <label>longitud <input id="lon" type="number" step="0.000001" placeholder="2.170" /></label>
+            <label>zona <select id="tzSelect"></select></label>
+          </div>
+
+          <div class="campos">
+            <label class="toggle" id="tglUnknown"><input type="checkbox" id="chkUnknownTime"><span class="lbl">no
+                conozco la hora</span> <span class="pill" id="stateUnknown">off</span></label>
+            <label class="toggle on" id="tglVisible"><input type="checkbox" id="chkVisible" checked><span
+                class="lbl">solo planetas visibles</span> <span class="pill" id="stateVisible">on</span></label>
+          </div>
+
+          <div id="unknownExtras" style="display:none">
+            <label>casas con hora desconocida
+              <select id="suspectAsc">
+                <option value="">sin casas</option>
+                <option value="0">asc sospechado: aries</option>
+                <option value="1">asc sospechado: tauro</option>
+                <option value="2">asc sospechado: géminis</option>
+                <option value="3">asc sospechado: cáncer</option>
+                <option value="4">asc sospechado: leo</option>
+                <option value="5">asc sospechado: virgo</option>
+                <option value="6">asc sospechado: libra</option>
+                <option value="7">asc sospechado: escorpio</option>
+                <option value="8">asc sospechado: sagitario</option>
+                <option value="9">asc sospechado: capricornio</option>
+                <option value="10">asc sospechado: acuario</option>
+                <option value="11">asc sospechado: piscis</option>
+              </select>
+            </label>
+            <div class="mini">con un signo, casas whole sign y aspectos por signos al asc sospechado. sin él, no hay
+              casas.</div>
+          </div>
+
+          <div class="fila">
+            <button type="button" id="btnAdv" class="advLink" aria-expanded="false">más opciones</button>
+            <button id="btnNow">usar aquí y ahora</button>
+            <button id="btnExample">cargar ejemplo</button>
+            <button id="btnSave" hidden>guardar carta</button>
+            <button id="btnTest" hidden>autotest</button>
+          </div>
+
+          <div id="advPanel" hidden>
+            <div class="campos">
+              <label class="toggle" id="tglNodes"><input type="checkbox" id="objNodes"><span class="lbl">nodos
+                  lunares</span> <span class="pill">off</span></label>
+              <label class="toggle" id="tglLilith"><input type="checkbox" id="objLilith"><span
+                  class="lbl">lilith</span> <span class="pill">off</span></label>
+              <label class="toggle" id="tglChiron"><input type="checkbox" id="objChiron"><span class="lbl">quirón
+                  ≈</span> <span class="pill">off</span></label>
+              <label class="toggle" id="tglFortune"><input type="checkbox" id="objFortune"><span class="lbl">parte de
+                  la fortuna</span> <span class="pill">off</span></label>
+            </div>
+            <div class="campos">
+              <label>casas
+                <select id="houseSystem">
+                  <option value="whole" selected>whole sign</option>
+                  <option value="equal">igual</option>
+                  <option value="placidus">placidus</option>
+                </select>
+              </label>
+              <label>aspectos
+                <select id="aspectMode">
+                  <option value="sign" selected>por signos</option>
+                  <option value="degree">por grado</option>
+                </select>
+              </label>
+              <label id="orbRow" style="display:none">orbe <b id="orbVal">6</b>°
+                <input type="range" id="orbMax" min="1" max="10" step="0.5" value="6">
+              </label>
+            </div>
+            <div class="campos">
+              <label class="toggle" id="tglRetro"><input type="checkbox" id="tradRetro"><span class="lbl">℞
+                  retrogradación</span> <span class="pill">off</span></label>
+              <label class="toggle" id="tglSect"><input type="checkbox" id="tradSect"><span class="lbl">secta
+                  diurna/nocturna</span> <span class="pill">off</span></label>
+            </div>
+          </div>
+
+          <div class="mini">la zona horaria va por ciudades (iana) y ajusta el horario de verano sola.</div>
+          <div id="testout" class="test"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- debajo: las tablas -->
+  <section id="tablas">
+    <div class="sec">
+      <h2>planetas</h2>
+      <div id="readout" class="legend"></div>
+    </div>
+    <div class="sec">
+      <h2>aspectos al ascendente</h2>
+      <div id="ascAspects" class="legend"></div>
+    </div>
+    <div class="sec">
+      <h2>aspectos entre planetas</h2>
+      <div id="ppAspects" class="legend"></div>
+    </div>
+    <div class="sec">
+      <h2>casas</h2>
+      <div id="houses" class="legend"></div>
+    </div>
+    <div class="sec sec-tr">
+      <h2>tránsitos sobre la carta <span class="muted">(orbe 3°)</span></h2>
+      <div id="trAspects" class="legend"></div>
+    </div>
+    <div class="sec">
+      <h2>qué estás viendo</h2>
+      <div class="mini">
+        dignidades: fuerza o debilidad de un planeta en su signo: domicilio, exaltación, detrimento, caída; si no,
+        peregrino. aspectos por signos: 2 sextil, 3 cuadratura, 4 trígono, 6 oposición. la línea blanca son los
+        ángulos; en el gris, los aspectos suaves; en rojo, los duros.
+      </div>
+      <div id="anglesInfo"></div>
+    </div>
+  </section>
+
+  <a class="firma" href="https://meowrhino.studio">meowrhino studio</a>
+
+  <script src="../../carta.js"></script>
+  <script src="estilo.js"></script>
+</body>
+
+</html>
