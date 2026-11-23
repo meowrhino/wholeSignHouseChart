@@ -653,7 +653,7 @@ const escHTML = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').repl
 function renderLibrary() {
   const list = loadPeople(); const ul = $('#libraryList');
   ul.innerHTML = '';
-  if (!list.length) { ul.innerHTML = '<div class="mini">aún no hay cartas guardadas — rellena el formulario y pulsa «guardar carta».</div>'; return; }
+  if (!list.length) { ul.innerHTML = '<div class="mini">aún no hay cartas guardadas — dibuja una carta y pulsa «guardar».</div>'; return; }
   for (const rec of list) {
     const div = document.createElement('div'); div.className = 'libRow';
     const when = rec.params.u === '1' ? `${rec.params.d || ''} · hora desconocida` : `${rec.params.d || ''} ${rec.params.t || ''}`;
