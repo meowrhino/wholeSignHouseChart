@@ -482,7 +482,20 @@ function computeAndDraw(mode) {
 }
 
 // Geocoder OSM
-async function geocode() { const q = $('#q').value.trim(); if (!q) return; setStatus('buscando…'); try { const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`; const res = await fetch(url, { headers: { 'Accept-Language': 'es' } }); const arr = await res.json(); if (arr && arr.length) { $('#lat').value = parseFloat(arr[0].lat).toFixed(6); $('#lon').value = parseFloat(arr[0].lon).toFixed(6); setStatus(`📍 ${arr[0].display_name}`); } else setStatus('no encontrado.'); } catch (e) { setStatus('error de red al geocodificar.', 'error'); } }
+async function geocode() { const q = $('#q').value.trim(); if (!q) return; setStatus('buscando…'); try { const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`; const res = await fetch(url, { headers: { 'Accept-Language': 'es' } }); const arr = await res.json(); if (arr && arr.length) { $('#lat').value = parseFloat(arr[0].lat).toFixed(6); $('#lon').value = parseFloat(arr[0].lon).toFixed(6); const z = await ponerZona(+arr[0].lat, +arr[0].lon); setStatus(`📍 ${arr[0].display_name}${z ? ' · hora de ' + z : ''}`); } else setStatus('no encontrado.'); } catch (e) { setStatus('error de red al geocodificar.', 'error'); } }
+
+// la zona horaria sale del lugar, no del navegador: alguien nacido en buenos aires que mira desde madrid.
+// tz-lookup.js (coordenadas → zona, sin red) se carga la primera vez que hace falta.
+let tzListo = null;
+async function ponerZona(lat, lon) {
+  if (isNaN(lat) || isNaN(lon)) return null;
+  tzListo = tzListo || new Promise((ok, ko) => { const s = document.createElement('script'); s.src = 'tz-lookup.js'; s.onload = ok; s.onerror = ko; document.head.appendChild(s); });
+  try { await tzListo; } catch (_) { tzListo = null; return null; } // sin el archivo, se queda la zona que hubiera
+  const z = window.tzlookup(lat, lon), sel = $('#tzSelect');
+  if (![...sel.options].some(o => o.value === z)) sel.add(new Option(z, z)); // p. ej. asia/kolkata, que algunos navegadores listan como asia/calcutta
+  sel.value = z;
+  return z;
+}
 
 // TZ selector (IANA)
 function populateTZ() {
@@ -729,6 +742,8 @@ $('#btnTest').addEventListener('click', runTests);
 $('#btnExample').addEventListener('click', () => { $('#name').value = 'ejemplo'; $('#date').value = '1997-02-28'; $('#time').value = '15:40'; $('#lat').value = '36.600000'; $('#lon').value = '-6.216667'; setStatus('ejemplo cargado.'); });
 $('#chkUnknownTime').addEventListener('change', updateSwitchUI);
 $('#chkVisible').addEventListener('change', updateSwitchUI);
+// lat y lon escritas a mano: también ponen la zona de ese sitio
+['#lat', '#lon'].forEach(s => $(s).addEventListener('change', () => ponerZona(parseFloat($('#lat').value), parseFloat($('#lon').value))));
 
 // Modo avanzado: desplegable + controles
 $('#btnAdv').addEventListener('click', () => { const ap = $('#advPanel'), ab = $('#btnAdv'); const open = ap.hidden; ap.hidden = !open; ab.setAttribute('aria-expanded', String(open)); });
